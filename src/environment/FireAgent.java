@@ -1,4 +1,7 @@
+package environment;
+
 import java.util.ArrayList;
+
 
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;

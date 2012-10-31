@@ -1,3 +1,4 @@
+package environment;
 
 public enum WindDirection {
 	N	(0),
