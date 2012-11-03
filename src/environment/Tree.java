@@ -18,7 +18,7 @@ public class Tree extends java.lang.Number{
 		this.x=x;
 		this.y=y;
 		density=d;
-		initLife=40-density;
+		initLife=20;
 		life=new Integer(initLife);
 		state=TreeState.FRESH;
 	}
@@ -50,18 +50,21 @@ public class Tree extends java.lang.Number{
 			//burnProb 0.4-0.6
 			
 			int v = Random.uniform.nextIntFromTo(0, 100);
-			int f = initLife-life;
-			System.out.println("v: "+v+" life: "+f+" prob: "+prob+" all: "+f+prob);
+			int multiplyer=2;
 			
-			if(v < initLife-life+prob)
+			if(v < density*multiplyer+prob)
 				state=TreeState.BURNING;
 			else
 				return false;
 		}
-		else if(--life<=0){
-			state=TreeState.ASHES;
-			density=33;
-			return false;
+		else {
+			
+			life-=(5-density)*2;
+			if(life<=0){
+				state=TreeState.ASHES;
+				density=5;
+				return false;
+			}
 		}
 		return true;
 	}

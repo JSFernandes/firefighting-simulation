@@ -1,6 +1,9 @@
 package environment;
 
 import java.awt.Color;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -14,7 +17,7 @@ import uchicago.src.sim.util.Random;
 public class Space {
 	public Object2DTorus trees_;
 	public Object2DTorus fire_;
-	public int width_ = 300, height_ = 300;
+	public int width_ = 200, height_ = 200;
 	public WindDirection wind_;
 
 	public Space() {
@@ -48,7 +51,7 @@ public class Space {
 	void build() {
 		HeightMapGenerator hmg = new HeightMapGenerator();
 		hmg.setSize(height_, width_);
-		hmg.setVariance(16);
+		hmg.setVariance(32);
 		double[][] map = hmg.generate();
 
 		for (int i = 0; i < width_; ++i)
@@ -58,24 +61,81 @@ public class Space {
 					v = 1;
 				if (v > 32)
 					v = 32;
-				trees_.putObjectAt(i, j, new Tree(i, j, (int) v));
+				
+				int a=0;
+				if(v<8)
+					a=1;
+				else if(v<16)
+					a=2;
+				else if(v<24)
+					a=3;
+				else 
+					a=4;
+				trees_.putObjectAt(i, j, new Tree(i, j,  a));
 
 			}
 		// System.out.println(Arrays.deepToString(map));
+		/*String s="";
+		for(int i=0; i<200; ++i){
+			s+="\n";
+			for(int j=0; j<200; ++j){
+				int a = ((Tree) trees_.getObjectAt(i, j)).density;
+				String c;
+				if(a<8)
+					c="1";
+				else if(a<16)
+					c="2";
+				else if(a<24)
+					c="3";
+				else 
+					c="4";
+				s+= c;
+				if(j!=199)
+					s+=", ";
+			}
+		}
+		
+		PrintWriter out;
+		try {
+			out = new PrintWriter(new FileWriter("C:\\aforest.txt"));
+			out.print(s); 
+			
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} */
 	}
 
 	// TODO: Refactor
 	public Value2DDisplay getSpaceDisplay() {
 		class myColorMap extends ColorMap {
 			myColorMap() {
-				for (int i = 1; i <= 32; ++i) {
+				/*for (int i = 1; i <= 32; ++i) {
 					int v = 255 - (i - 1) * 7;
 					this.mapColor(i, new Color(32, v, 32));
 				}
-				this.mapColor(33, new Color(209, 177, 135));
+				this.mapColor(33, new Color(209, 255, 135));
+				
+				for(int i=1; i<=32; ++i)
+					if(i<8)
+						this.mapColor(i, new Color(32, 180, 32));
+					else if(i<16)
+						this.mapColor(i, new Color(32, 140, 32));
+					else if(i<24)
+						this.mapColor(i, new Color(32, 100, 32));
+					else 
+						this.mapColor(i, new Color(32, 60, 32));*/
+				this.mapColor(5, new Color(209, 255, 135));
+				this.mapColor(1, new Color(32, 180, 32));
+				this.mapColor(2, new Color(32, 140, 32));
+				this.mapColor(3, new Color(32, 100, 32));
+				this.mapColor(4, new Color(32, 60, 32));
 			}
 
 			public Color getColor(Integer i) {
+				if(i<1 || i>4)
+					i=1;
 				return this.getColor(i.intValue());
 			}
 

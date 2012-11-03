@@ -63,7 +63,7 @@ public class FireAgent implements Drawable {
 		for (int i = 0; i < v.size(); ++i) {
 
 			if (i < 3) {
-				incenerating_prob_ = 35;
+				incenerating_prob_ = 30;
 			} else if (i == 3 || i == 7) {
 				incenerating_prob_ = 15;
 			} else {
@@ -74,7 +74,7 @@ public class FireAgent implements Drawable {
 			if (t != null) {
 				switch (t.getState()) {
 					case FRESH :
-						if (t.burn(incenerating_prob_ + fire_intensity_))
+						if (t.burn(incenerating_prob_))
 							space_.fire_.putObjectAt(t.x, t.y, new FireAgent(t.x,
 									t.y, space_));
 						break;
