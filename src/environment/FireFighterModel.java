@@ -1,7 +1,10 @@
 package environment;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 
+import uchicago.src.reflector.ListPropertyDescriptor;
+import uchicago.src.reflector.PropertyWidget;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.engine.SimModelImpl;
@@ -18,6 +21,12 @@ public class FireFighterModel extends SimModelImpl {
 	protected ArrayList<FireAgent> fire_agents_;
 	protected Object2DDisplay agent_display_;
 
+	//PARAMS
+	private int windDirection = 0;
+	private int windStrength = 2;
+	public static int spreadMultiplier = 3;
+	public static int burnMultiplier = 3;
+	
 	public static void main(String[] args) {
 		SimInit init = new SimInit();
 		FireFighterModel model = new FireFighterModel();
@@ -25,13 +34,21 @@ public class FireFighterModel extends SimModelImpl {
 	}
 
 	public FireFighterModel() {
+		
 	}
-
+	
+	private void configureWind(){
+		if (space_ != null)
+			space_.configureWind(windDirection,windStrength);
+	}
+	
 	public void begin() {
 		buildModel();
 		buildDisplay();
 		buildSchedule();
-
+		
+		configureWind();
+		
 		display_surface_.display();
 	}
 
@@ -60,9 +77,65 @@ public class FireFighterModel extends SimModelImpl {
 		space_ = new Space();
 	}
 
+	private void initParamDropdowns(){
+		Hashtable<Integer,String> h1 = new Hashtable<Integer,String>();
+		h1.put(new Integer(0), "North");
+		h1.put(new Integer(1), "NorthEast");
+		h1.put(new Integer(2), "East");
+		h1.put(new Integer(3), "SouthEast");
+		h1.put(new Integer(4), "South");
+		h1.put(new Integer(5), "SouthWest");
+		h1.put(new Integer(6), "West");
+		h1.put(new Integer(7), "NorthWest");
+		ListPropertyDescriptor pd = new ListPropertyDescriptor("WindDirection", h1);
+		
+		
+		descriptors.put("WindDirection", pd);
+//		System.out.println(pd.getWidget().getValue());
+//		pd.getWidget().setValue(5);
+//		System.out.println(pd.getWidget().getValue());
+		
+	}
+	
 	public String[] getInitParam() {
-		String[] params = { "teste1", "teste2" };
+		String[] params = { "WindDirection", "WindStrength", "SpreadMultiplier", "BurnMultiplier" };	
+		
 		return params;
+	}
+	
+	public void setBurnMultiplier(int a){
+		burnMultiplier = a;
+	}
+	
+	public int getBurnMultiplier(){
+		return burnMultiplier;
+	}
+	
+	public void setSpreadMultiplier(int a){
+		spreadMultiplier = a;
+	}
+	
+	public int getSpreadMultiplier(){
+		return spreadMultiplier;
+	}
+	
+	public void setWindDirection(int a){
+		windDirection = a;
+		configureWind();
+	}
+	
+	public int getWindDirection(){
+		return windDirection;
+	}
+	
+	public void setWindStrength(int a){
+		windStrength =  a;
+		configureWind();
+		
+	}
+	
+	public int getWindStrength(){
+		return windStrength;
 	}
 
 	public String getName() {
@@ -74,6 +147,8 @@ public class FireFighterModel extends SimModelImpl {
 	}
 
 	public void setup() {
+		initParamDropdowns();
+		
 		schedule_ = null;
 		space_ = null;
 

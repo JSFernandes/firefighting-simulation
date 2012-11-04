@@ -18,9 +18,12 @@ public class Tree extends java.lang.Number{
 		this.x=x;
 		this.y=y;
 		density=d;
-		initLife=20;
+		initLife=40;
 		life=new Integer(initLife);
 		state=TreeState.FRESH;
+		
+		if(d==0)
+			state=TreeState.ASHES;
 	}
 
 	public boolean isFresh(){
@@ -50,16 +53,16 @@ public class Tree extends java.lang.Number{
 			//burnProb 0.4-0.6
 			
 			int v = Random.uniform.nextIntFromTo(0, 100);
-			int multiplyer=2;
-			
+			int multiplyer=FireFighterModel.burnMultiplier;
+
 			if(v < density*multiplyer+prob)
 				state=TreeState.BURNING;
 			else
 				return false;
 		}
 		else {
-			
-			life-=(5-density)*2;
+			//int d = (life/initLife)*density;
+			life-=(5-density)*FireFighterModel.spreadMultiplier;
 			if(life<=0){
 				state=TreeState.ASHES;
 				density=5;
@@ -91,7 +94,7 @@ public class Tree extends java.lang.Number{
 	//for prints
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
+		
 		return "x: "+x+" y: "+y;
 	}
 

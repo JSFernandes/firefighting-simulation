@@ -19,16 +19,25 @@ public class Space {
 	public Object2DTorus fire_;
 	public int width_ = 200, height_ = 200;
 	public WindDirection wind_;
-
+	public boolean eightDirections = true;
+	
+	
 	public Space() {
 		trees_ = new Object2DTorus(width_, height_);
 		fire_ = new Object2DTorus(width_, height_);
-		wind_ = WindDirection.NW;
+		
+		
+		//wind_=WindDirection.N;
+		//wind_.setStrength(3);
 		
 		build();
 		startFire();
 	}
 
+	public void configureWind(int windDirection, int windStrength){
+		wind_ = new WindDirection(windDirection, windStrength);
+	}
+	
 	void startFire() {
 		for (int i = 0; i < 1; ++i) {
 			addAgent();
@@ -74,6 +83,10 @@ public class Space {
 				trees_.putObjectAt(i, j, new Tree(i, j,  a));
 
 			}
+		
+		for(int i=20; i<180; i++)
+			trees_.putObjectAt(100, i, new Tree(100, i,  0));
+		
 		// System.out.println(Arrays.deepToString(map));
 		/*String s="";
 		for(int i=0; i<200; ++i){
@@ -107,7 +120,6 @@ public class Space {
 		} */
 	}
 
-	// TODO: Refactor
 	public Value2DDisplay getSpaceDisplay() {
 		class myColorMap extends ColorMap {
 			myColorMap() {
@@ -131,11 +143,10 @@ public class Space {
 				this.mapColor(2, new Color(32, 140, 32));
 				this.mapColor(3, new Color(32, 100, 32));
 				this.mapColor(4, new Color(32, 60, 32));
+				this.mapColor(0, new Color(255, 255, 255));
 			}
 
 			public Color getColor(Integer i) {
-				if(i<1 || i>4)
-					i=1;
 				return this.getColor(i.intValue());
 			}
 
@@ -190,39 +201,46 @@ public class Space {
 	 */
 	public ArrayList<Tree> getNeighbors(int x, int y) {
 		LinkedList<Tree> temp = new LinkedList<Tree>();
-		// if(y==0 || x==0 || y==h-1 || x==w-1)
-		// System.out.println("fff");
+		
 		temp.add(fire_.getObjectAt(x, y - 1) == null && y != 0 ? (Tree) trees_
 				.getObjectAt(x, y - 1) : null);
 		
-		temp.add(fire_.getObjectAt(x + 1, y - 1) == null && x != width_ - 1 && y != 0 ? (Tree) trees_
+		if(eightDirections)
+			temp.add(fire_.getObjectAt(x + 1, y - 1) == null && x != width_ - 1 && y != 0 ? (Tree) trees_
 				.getObjectAt(x + 1, y - 1) : null);
 		
 		temp.add(fire_.getObjectAt(x + 1, y) == null && x != width_ - 1 ? (Tree) trees_
 				.getObjectAt(x + 1, y) : null);
 		
-		temp.add(fire_.getObjectAt(x + 1, y + 1) == null && x != width_ - 1
+		if(eightDirections)
+			temp.add(fire_.getObjectAt(x + 1, y + 1) == null && x != width_ - 1
 				&& y != height_ - 1 ? (Tree) trees_.getObjectAt(x + 1, y + 1) : null);
 		
 		temp.add(fire_.getObjectAt(x, y + 1) == null && y != height_ - 1 ? (Tree) trees_
 				.getObjectAt(x, y + 1) : null);
 		
-		temp.add(fire_.getObjectAt(x - 1, y + 1) == null && x != 0 && y != height_ - 1 ? (Tree) trees_
+		if(eightDirections)
+			temp.add(fire_.getObjectAt(x - 1, y + 1) == null && x != 0 && y != height_ - 1 ? (Tree) trees_
 				.getObjectAt(x - 1, y + 1) : null);
 		
 		temp.add(fire_.getObjectAt(x - 1, y) == null && x != 0 ? (Tree) trees_
 				.getObjectAt(x - 1, y) : null);
 		
+		if(eightDirections)
 		temp.add(fire_.getObjectAt(x - 1, y - 1) == null && x != 0 && y != 0 ? (Tree) trees_
 				.getObjectAt(x - 1, y - 1) : null);
 
-		ArrayList<Tree> result = new ArrayList<Tree>(8);
-		for (int i = 0; i < 8; ++i) {
+		
+		int siz= eightDirections ? 8 : 4;
+		
+		
+		ArrayList<Tree> result = new ArrayList<Tree>(siz);
+		for (int i = 0; i < siz; ++i) {
 			result.add(null);
 		}
 		
-		for (int val = 0; val < 8; ++val) {
-			int a = (val - (wind_.value() - 1) + 8) % 8;
+		for (int val = 0; val < siz; ++val) {
+			int a = (val - (wind_.value() - 1) + siz) % siz;
 			Tree t = temp.get(val);
 			result.set(a, t);
 		}

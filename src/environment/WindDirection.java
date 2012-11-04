@@ -1,26 +1,34 @@
 package environment;
 
-public enum WindDirection {
-	N	(0),
-	NE	(1),
-	E	(2),
-	SE	(3),
-	S	(4),
-	SW	(5),
-	W	(6),
-	NW	(7);
-
-	private int value_;
-
-	WindDirection(int value) {
-		value_ = value;
+public class WindDirection {
+	
+	private static int N = 0;
+	private static int NE = 1;
+	private static int E = 2;
+	private static int SE = 3;
+	private static int S = 4;
+	private static int SW = 5;
+	private static int W = 6;
+	private static int NW = 7;
+	
+	private int dir_;
+	private int strength_;
+	
+	WindDirection(int dir, int str) {
+		dir_ = dir;
+		strength_ = str;
 	}
 
 	public int value() {
-		return value_;
+		return dir_;
+	}
+	
+//	public void setStrength(int s){
+//		strength_ = s;
+//	}
+	
+	public int strength() {
+		return strength_;
 	}
 
-	public int index(WindDirection w) {
-		return (value_ - (w.value_ - 1) + 8) % 8; // quantidade de lls
-	}
 }
