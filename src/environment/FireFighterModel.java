@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 
+import strategy.FrontStrategy;
 import uchicago.src.reflector.ListPropertyDescriptor;
 import uchicago.src.reflector.PropertyWidget;
 import uchicago.src.sim.engine.Schedule;
@@ -11,15 +12,18 @@ import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.gui.Value2DDisplay;
+import units.Commander;
+import units.Firefighter;
 
 public class FireFighterModel extends SimModelImpl {
 
 	protected DisplaySurface display_surface_;
 
 	protected Schedule schedule_;
-	protected Space space_;
-	protected ArrayList<FireAgent> fire_agents_;
+	public Space space_;
+	public ArrayList<FireAgent> fire_agents_;
 	protected Object2DDisplay agent_display_;
+	Commander com_;
 
 	//PARAMS
 	private int windDirection = 0;
@@ -75,6 +79,18 @@ public class FireFighterModel extends SimModelImpl {
 
 	private void buildModel() {
 		space_ = new Space();
+		com_ = new Commander(null, this, new FrontStrategy());
+		space_.agents_.putObjectAt(30, 30, new Firefighter(30, 30, space_, com_));
+		space_.agents_.putObjectAt(30, 31, new Firefighter(30, 31, space_, com_));
+		space_.agents_.putObjectAt(31, 31, new Firefighter(31, 31, space_, com_));
+		space_.agents_.putObjectAt(31, 30, new Firefighter(31, 30, space_, com_));
+		space_.agents_.putObjectAt(30, 29, new Firefighter(30, 29, space_, com_));
+		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(30, 30));
+		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(30, 31));
+		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(31, 31));
+		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(31, 30));
+		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(30, 29));
+		com_.units_ = space_.firefighters_.toArray(new Firefighter[space_.firefighters_.size()]);
 	}
 
 	private void initParamDropdowns(){
@@ -167,8 +183,10 @@ public class FireFighterModel extends SimModelImpl {
 	}
 
 	public void step() {
-		space_.fireStep();
+		if(getTickCount() < 20)
+			space_.fireStep();
 		space_.step();
+		com_.step();
 		// agentDisplay = space.getAgentDisplay();
 		display_surface_.updateDisplay();
 	}

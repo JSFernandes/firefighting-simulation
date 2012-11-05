@@ -13,18 +13,21 @@ import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.gui.Value2DDisplay;
 import uchicago.src.sim.space.Object2DTorus;
 import uchicago.src.sim.util.Random;
+import units.FirefightUnit;
+import units.Firefighter;
 
 public class Space {
 	public Object2DTorus trees_;
-	public Object2DTorus fire_;
+	public Object2DTorus agents_;
 	public int width_ = 200, height_ = 200;
 	public WindDirection wind_;
 	public boolean eightDirections = true;
+	ArrayList<Firefighter> firefighters_;
 	
 	
 	public Space() {
 		trees_ = new Object2DTorus(width_, height_);
-		fire_ = new Object2DTorus(width_, height_);
+		agents_ = new Object2DTorus(width_, height_);
 		
 		
 		//wind_=WindDirection.N;
@@ -32,6 +35,7 @@ public class Space {
 		
 		build();
 		startFire();
+		firefighters_ = new ArrayList<Firefighter>();
 	}
 
 	public void configureWind(int windDirection, int windStrength){
@@ -50,11 +54,11 @@ public class Space {
 		y = Random.uniform.nextIntFromTo(0, height_ - 1);
 		FireAgent fire_agent = new FireAgent(x, y, this);
 		fire_agent.fire_intensity_ = 1;
-		fire_.putObjectAt(x, y, fire_agent);
+		agents_.putObjectAt(x, y, fire_agent);
 	}
 
 	public void addAgent(int x, int y) {
-		fire_.putObjectAt(x, y, new FireAgent(x, y, this));
+		agents_.putObjectAt(x, y, new FireAgent(x, y, this));
 	}
 
 	void build() {
@@ -163,19 +167,21 @@ public class Space {
 	}
 
 	public Object2DDisplay getAgentDisplay() {
-		return new Object2DDisplay(fire_);
+		return new Object2DDisplay(agents_);
 	}
 
 	public void step() {
 		// build();//discoteca
+		for(int i = 0; i < firefighters_.size(); ++i)
+			firefighters_.get(i).step();
 	}
 
 	public void fireStep() {
 		ArrayList<FireAgent> agents = new ArrayList<FireAgent>();
-		BaseMatrix m = fire_.getMatrix();
+		BaseMatrix m = agents_.getMatrix();
 		for (int i = 0; i < width_; ++i)
 			for (int j = 0; j < height_; ++j)
-				if (m.get(i, j) != null)
+				if (m.get(i,j) != null && m.get(i, j).getClass().equals(FireAgent.class))
 					agents.add((FireAgent) m.get(i, j));
 
 		// SimUtilities.shuffle( agents );
@@ -185,7 +191,7 @@ public class Space {
 		for (int i = 0; i < siz; ++i) {
 			agent = agents.get(i);
 			if (agent.fire_intensity_ <= 0) {
-				fire_.putObjectAt(agent.x_, agent.y_, null);
+				agents_.putObjectAt(agent.x_, agent.y_, null);
 			} else {
 				agent.step();
 			}
@@ -202,32 +208,32 @@ public class Space {
 	public ArrayList<Tree> getNeighbors(int x, int y) {
 		LinkedList<Tree> temp = new LinkedList<Tree>();
 		
-		temp.add(fire_.getObjectAt(x, y - 1) == null && y != 0 ? (Tree) trees_
+		temp.add(agents_.getObjectAt(x, y - 1) == null && y != 0 ? (Tree) trees_
 				.getObjectAt(x, y - 1) : null);
 		
 		if(eightDirections)
-			temp.add(fire_.getObjectAt(x + 1, y - 1) == null && x != width_ - 1 && y != 0 ? (Tree) trees_
+			temp.add(agents_.getObjectAt(x + 1, y - 1) == null && x != width_ - 1 && y != 0 ? (Tree) trees_
 				.getObjectAt(x + 1, y - 1) : null);
 		
-		temp.add(fire_.getObjectAt(x + 1, y) == null && x != width_ - 1 ? (Tree) trees_
+		temp.add(agents_.getObjectAt(x + 1, y) == null && x != width_ - 1 ? (Tree) trees_
 				.getObjectAt(x + 1, y) : null);
 		
 		if(eightDirections)
-			temp.add(fire_.getObjectAt(x + 1, y + 1) == null && x != width_ - 1
+			temp.add(agents_.getObjectAt(x + 1, y + 1) == null && x != width_ - 1
 				&& y != height_ - 1 ? (Tree) trees_.getObjectAt(x + 1, y + 1) : null);
 		
-		temp.add(fire_.getObjectAt(x, y + 1) == null && y != height_ - 1 ? (Tree) trees_
+		temp.add(agents_.getObjectAt(x, y + 1) == null && y != height_ - 1 ? (Tree) trees_
 				.getObjectAt(x, y + 1) : null);
 		
 		if(eightDirections)
-			temp.add(fire_.getObjectAt(x - 1, y + 1) == null && x != 0 && y != height_ - 1 ? (Tree) trees_
+			temp.add(agents_.getObjectAt(x - 1, y + 1) == null && x != 0 && y != height_ - 1 ? (Tree) trees_
 				.getObjectAt(x - 1, y + 1) : null);
 		
-		temp.add(fire_.getObjectAt(x - 1, y) == null && x != 0 ? (Tree) trees_
+		temp.add(agents_.getObjectAt(x - 1, y) == null && x != 0 ? (Tree) trees_
 				.getObjectAt(x - 1, y) : null);
 		
 		if(eightDirections)
-		temp.add(fire_.getObjectAt(x - 1, y - 1) == null && x != 0 && y != 0 ? (Tree) trees_
+		temp.add(agents_.getObjectAt(x - 1, y - 1) == null && x != 0 && y != 0 ? (Tree) trees_
 				.getObjectAt(x - 1, y - 1) : null);
 
 		

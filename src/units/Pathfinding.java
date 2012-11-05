@@ -9,8 +9,6 @@ import environment.Space;
 
 public class Pathfinding {
 	
-	Space space_;
-	
 	double heuristic(Point2D source, Point2D target) {
 		return source.distance(target);
 	}
@@ -27,12 +25,13 @@ public class Pathfinding {
 		return min_point;
 	}
 	
-	boolean validatePoint(Point2D point) {
+	boolean validatePoint(Point2D point, Space space) {
 		double x = point.getX();
 		double y = point.getY();
-		return x >= 0 && x < space_.width_
-			&& y >= 0 && y < space_.height_
-			&& (space_.fire_.getObjectAt((int)x, (int)y) == null);
+		return x >= 0 && 
+			x < space.width_
+			&& y >= 0 && y < space.height_
+			&& (space.agents_.getObjectAt((int)x, (int)y) == null);
 		
 	}
 	
@@ -44,7 +43,7 @@ public class Pathfinding {
 		}
 	}
 	
-	Point2D[] findPath(Point2D source, Point2D target, String unit_type) {
+	Point2D[] findPath(Point2D source, Point2D target, Space space) {
 		
 		ArrayList<Point2D> closed_set = new ArrayList<Point2D>();
 		ArrayList<Point2D> open_set = new ArrayList<Point2D>();
@@ -88,21 +87,23 @@ public class Pathfinding {
 			
 			for(int i = 0; i < neighbours.length; ++i) {
 				next_point = neighbours[i];
-				if(!closed_set.contains(next_point)) {
-					if(!open_set.contains(next_point)) {
-						open_set.add(next_point);
-						h_score.put(next_point, heuristic(next_point, target));
-						update = true;
-					}
-					else if(g_score.get(current_point) + 1 < g_score.get(next_point))
-						update = true;
-					else
-						update = false;
-					
-					if(update) {
-						came_from.put(next_point, current_point);
-						g_score.put(next_point, g_score.get(current_point)+1);
-						f_score.put(next_point, g_score.get(next_point) + h_score.get(next_point));
+				if(validatePoint(next_point, space)) {
+					if(!closed_set.contains(next_point)) {
+						if(!open_set.contains(next_point)) {
+							open_set.add(next_point);
+							h_score.put(next_point, heuristic(next_point, target));
+							update = true;
+						}
+						else if(g_score.get(current_point) + 1 < g_score.get(next_point))
+							update = true;
+						else
+							update = false;
+						
+						if(update) {
+							came_from.put(next_point, current_point);
+							g_score.put(next_point, g_score.get(current_point)+1);
+							f_score.put(next_point, g_score.get(next_point) + h_score.get(next_point));
+						}
 					}
 				}
 			}

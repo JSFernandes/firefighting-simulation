@@ -74,7 +74,7 @@ public class FireAgent implements Drawable {
 				switch (t.getState()) {
 					case FRESH :
 						if (t.burn(incenerating_prob_))
-							space_.fire_.putObjectAt(t.x, t.y, new FireAgent(t.x,
+							space_.agents_.putObjectAt(t.x, t.y, new FireAgent(t.x,
 									t.y, space_));
 						break;
 					case BURNING :
