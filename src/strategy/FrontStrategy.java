@@ -1,6 +1,6 @@
 package strategy;
 
-import java.awt.geom.Point2D;
+import java.awt.Point;
 import java.util.ArrayList;
 
 import environment.FireAgent;
@@ -10,10 +10,10 @@ import environment.WindDirection;
 
 public class FrontStrategy extends Strategy {
 
-	Point2D[] determineLineEdges(int max_x, int min_x, int min_y, int max_y, WindDirection dir) {
-		Point2D[] edges = new Point2D[2];
-		edges[0] = new Point2D.Double();
-		edges[1] = new Point2D.Double();
+	Point[] determineLineEdges(int max_x, int min_x, int min_y, int max_y, WindDirection dir) {
+		Point[] edges = new Point[2];
+		edges[0] = new Point();
+		edges[1] = new Point();
 		// N
 		if(dir.value() == 0) {
 			edges[0].setLocation(min_x, min_y - units.Constants.SAFE_DISTANCE);
@@ -61,14 +61,14 @@ public class FrontStrategy extends Strategy {
 	}
 	
 	
-	ArrayList<Point2D> attributeFighters(int num_firemen, Point2D[] edges) {
-		ArrayList<Point2D> fire_pos = new ArrayList<Point2D>();
+	ArrayList<Point> attributeFighters(int num_firemen, Point[] edges) {
+		ArrayList<Point> fire_pos = new ArrayList<Point>();
 		int edge_distance = (int)(edges[0].distance(edges[1]));
 		double fireman_per_tile = ((double)num_firemen/(double)edge_distance);
 		
-		Point2D current_point = (Point2D) edges[0].clone();
-		int increment_x = (int) (edges[1].getX()-edges[0].getX());
-		int increment_y = (int) (edges[1].getY()-edges[0].getY());
+		Point current_point = (Point) edges[0].clone();
+		int increment_x =  (edges[1].x-edges[0].x);
+		int increment_y =  (edges[1].y-edges[0].y);
 		
 		if(increment_x > 0)
 			increment_x = 1;
@@ -89,7 +89,7 @@ public class FrontStrategy extends Strategy {
 		while(current_point.getX() != edges[1].getX() || current_point.getY() != edges[1].getY()) {
 			current_fmen_count += fireman_per_tile;
 			if(Math.floor(current_fmen_count) > Math.floor(prev_fmen_count))
-				fire_pos.add((Point2D)current_point.clone());
+				fire_pos.add((Point)current_point.clone());
 			prev_fmen_count = current_fmen_count;
 			current_point.setLocation(current_point.getX()+increment_x, current_point.getY()+increment_y);
 		}
@@ -98,7 +98,7 @@ public class FrontStrategy extends Strategy {
 		
 	}
 	@Override
-	public ArrayList<Point2D> determineFightersPos(FireFighterModel model,
+	public ArrayList<Point> determineFightersPos(FireFighterModel model,
 			boolean[][] sight, int num_trucks, int num_firemen) {
 		int max_x, max_y, min_x, min_y;
 		max_x = max_y = 0;
@@ -121,7 +121,7 @@ public class FrontStrategy extends Strategy {
 			
 		}
 		
-		Point2D[] edges = determineLineEdges(max_x, min_x, min_y, max_y, model.space_.wind_);
+		Point[] edges = determineLineEdges(max_x, min_x, min_y, max_y, model.space_.wind_);
 		
 		return attributeFighters(num_firemen, edges);
 	}

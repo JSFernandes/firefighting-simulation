@@ -1,13 +1,13 @@
 package command;
 
-import java.awt.geom.Point2D;
+import java.awt.Point;
 
 public class Command {
 	
 	public CommandType type_;
-	public Point2D target_;
+	public Point target_;
 	
-	public Command(CommandType type, Point2D target) {
+	public Command(CommandType type, Point target) {
 		type_ = type;
 		target_ = target;
 	}

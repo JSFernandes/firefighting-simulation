@@ -1,5 +1,5 @@
 package units;
-import java.awt.geom.Point2D;
+import java.awt.Point;
 import java.util.ArrayList;
 
 import command.Command;
@@ -30,7 +30,7 @@ public class Commander implements Stepable {
 	}
 	
 	public void decision() {
-		ArrayList<Point2D> pos = strat_.determineFightersPos(mod_, sight_, trucks_.length, units_.length);
+		ArrayList<Point> pos = strat_.determineFightersPos(mod_, sight_, trucks_.length, units_.length);
 		for(int i = 0; i < pos.size(); ++i) {
 			units_[i].orders_.add(new Command(CommandType.MOVE, pos.get(i)));
 			units_[i].orders_.add(new Command(CommandType.WATER, null));

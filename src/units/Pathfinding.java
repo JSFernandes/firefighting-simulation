@@ -1,19 +1,21 @@
 package units;
-import java.awt.geom.Point2D;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Vector;
 
+import environment.FireAgent;
 import environment.Space;
 
 
 public class Pathfinding {
 	
-	double heuristic(Point2D source, Point2D target) {
+	double heuristic(Point source, Point target) {
 		return source.distance(target);
 	}
 	
-	private int getMinScore(ArrayList<Point2D> points, HashMap<Point2D, Double> scores) {
+	private int getMinScore(ArrayList<Point> points, HashMap<Point, Double> scores) {
 		int min_point = 0;
 		Double min_score = Double.MAX_VALUE;
 		for(int i = 0; i < points.size(); ++i) {
@@ -25,65 +27,77 @@ public class Pathfinding {
 		return min_point;
 	}
 	
-	boolean validatePoint(Point2D point, Space space) {
-		double x = point.getX();
-		double y = point.getY();
+	boolean fireInRange(Point point, Space space, int range) {
+		Vector<Object> agents = space.agents_.getMooreNeighbors((int)point.x, (int)point.y, range, range, false);
+		Collections.shuffle(agents);
+		for(int i = 0; i < agents.size(); ++i) {
+			if(agents.get(i).getClass() == FireAgent.class) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	boolean validatePoint(Point point, Space space) {
+		double x = point.x;
+		double y = point.y;
 		return x >= 0 && 
 			x < space.width_
 			&& y >= 0 && y < space.height_
-			&& (space.agents_.getObjectAt((int)x, (int)y) == null);
+			&& (space.agents_.getObjectAt((int)x, (int)y) == null)
+			&& (!fireInRange(point, space, 3));
 		
 	}
 	
-	void reconstructPath(Point2D current_point, HashMap<Point2D, Point2D> came_from, ArrayList<Point2D> path) {
-		Point2D prev = came_from.get(current_point);
+	void reconstructPath(Point current_point, HashMap<Point, Point> came_from, ArrayList<Point> path) {
+		Point prev = came_from.get(current_point);
 		if(prev != null) {
 			path.add(prev);
 			reconstructPath(prev, came_from, path);
 		}
 	}
 	
-	Point2D[] findPath(Point2D source, Point2D target, Space space) {
+	Point[] findPath(Point source, Point target, Space space) {
 		
-		ArrayList<Point2D> closed_set = new ArrayList<Point2D>();
-		ArrayList<Point2D> open_set = new ArrayList<Point2D>();
-		HashMap<Point2D, Point2D> came_from = new HashMap<Point2D, Point2D>();
+		ArrayList<Point> closed_set = new ArrayList<Point>();
+		ArrayList<Point> open_set = new ArrayList<Point>();
+		HashMap<Point, Point> came_from = new HashMap<Point, Point>();
 		
 		open_set.add(source);
 		
-		HashMap<Point2D, Double> g_score = new HashMap<Point2D, Double>();
-		HashMap<Point2D, Double> h_score = new HashMap<Point2D, Double>();
-		HashMap<Point2D, Double> f_score = new HashMap<Point2D, Double>();
+		HashMap<Point, Double> g_score = new HashMap<Point, Double>();
+		HashMap<Point, Double> h_score = new HashMap<Point, Double>();
+		HashMap<Point, Double> f_score = new HashMap<Point, Double>();
 		
 		g_score.put(source, 0.0);
 		h_score.put(source, heuristic(source, target));
 		f_score.put(source, h_score.get(source));
 		
 		int current_index;
-		Point2D current_point, next_point;
-		Point2D[] neighbours = new Point2D[8];
+		Point current_point, next_point;
+		Point[] neighbours = new Point[8];
 		boolean update = false;
 		while(!open_set.isEmpty()) {
 			current_index = getMinScore(open_set, f_score);
 			current_point = open_set.get(current_index);
 			if(current_point.equals(target)) {
-				ArrayList<Point2D> path = new ArrayList<Point2D>();
+				ArrayList<Point> path = new ArrayList<Point>();
 				reconstructPath(current_point, came_from, path);
 				Collections.reverse(path);
-				return (Point2D[]) path.toArray(new Point2D[path.size()]);
+				return (Point[]) path.toArray(new Point[path.size()]);
 			}
 			
 			open_set.remove(current_index);
 			closed_set.add(current_point);
 			
-			neighbours[0] = new Point2D.Double(current_point.getX()+1, current_point.getY());
-			neighbours[1] = new Point2D.Double(current_point.getX()-1, current_point.getY());
-			neighbours[2] = new Point2D.Double(current_point.getX(), current_point.getY()+1);
-			neighbours[3] = new Point2D.Double(current_point.getX(), current_point.getY()-1);
-			neighbours[4] = new Point2D.Double(current_point.getX()+1, current_point.getY()+1);
-			neighbours[5] = new Point2D.Double(current_point.getX()+1, current_point.getY()-1);
-			neighbours[6] = new Point2D.Double(current_point.getX()-1, current_point.getY()+1);
-			neighbours[7] = new Point2D.Double(current_point.getX()-1, current_point.getY()-1);
+			neighbours[0] = new Point(current_point.x +1, current_point.y);
+			neighbours[1] = new Point(current_point.x-1, current_point.y);
+			neighbours[2] = new Point(current_point.x, current_point.y+1);
+			neighbours[3] = new Point(current_point.x, current_point.y-1);
+			neighbours[4] = new Point(current_point.x+1, current_point.y+1);
+			neighbours[5] = new Point(current_point.x+1, current_point.y-1);
+			neighbours[6] = new Point(current_point.x-1, current_point.y+1);
+			neighbours[7] = new Point(current_point.x-1, current_point.y-1);
 			
 			for(int i = 0; i < neighbours.length; ++i) {
 				next_point = neighbours[i];
