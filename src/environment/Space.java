@@ -1,6 +1,7 @@
 package environment;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,22 +20,34 @@ import units.Firefighter;
 public class Space {
 	public Object2DTorus trees_;
 	public Object2DTorus agents_;
-	public int width_ = 200, height_ = 200;
+	public int width_ = 150, height_ = 150;
 	public WindDirection wind_;
 	public boolean eightDirections = true;
 	ArrayList<Firefighter> firefighters_;
 	
 	
 	public Space() {
-		trees_ = new Object2DTorus(width_, height_);
-		agents_ = new Object2DTorus(width_, height_);
+//		try {
+//			trees_ = FieldMap.getMap();
+//			width_ = FieldMap.width_;
+//			height_ = FieldMap.height_;
+//			
+//			agents_ = new Object2DTorus(width_, height_);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			
+			trees_ = new Object2DTorus(width_, height_);
+			agents_ = new Object2DTorus(width_, height_);
+			build();
+//		}
 		
+		toFieldMap();
 		
 		//wind_=WindDirection.N;
 		//wind_.setStrength(3);
 		
-		build();
-		startFire();
+		
+		//startFire();
 		firefighters_ = new ArrayList<Firefighter>();
 	}
 
@@ -61,6 +74,28 @@ public class Space {
 		agents_.putObjectAt(x, y, new FireAgent(x, y, this));
 	}
 
+	void toFieldMap(){
+		String s = new String();
+		s += width_ + " " + height_ + "\n";
+		for(int y=0; y<height_; ++y){
+			for(int x=0; x<width_; ++x){
+				s+=((Tree)trees_.getObjectAt(x, y)).density;
+			}
+			s+="\n";
+		}
+		
+		try{
+			 
+			  FileWriter fstream = new FileWriter("out.txt");
+			  BufferedWriter out = new BufferedWriter(fstream);
+			  System.out.println(s);
+			  out.write(s);
+			  out.close();
+			  }catch (Exception e){  }
+			  
+		
+	}
+	
 	void build() {
 		HeightMapGenerator hmg = new HeightMapGenerator();
 		hmg.setSize(height_, width_);

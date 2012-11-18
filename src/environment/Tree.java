@@ -2,17 +2,19 @@ package environment;
 import uchicago.src.sim.util.Random;
 
 
-public class Tree extends java.lang.Number{
+public class Tree extends java.lang.Number {
 	private static final long serialVersionUID = 1L;
 
 	public enum TreeState { 
-		FRESH,BURNING,ASHES
+		FRESH,
+		BURNING,
+		ASHES
 	};
 	
 	public TreeState state;
 	public int density;
-	public int life,initLife;
-	public int x,y;
+	public int life, initLife;
+	public int x, y;
 	
 	public Tree(int x, int y,int d) {
 		this.x=x;
