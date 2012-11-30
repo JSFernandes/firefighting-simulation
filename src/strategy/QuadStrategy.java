@@ -10,7 +10,7 @@ public class QuadStrategy extends Strategy {
 
 	@Override
 	public ArrayList<Point> determineFightersPos(FireFighterModel model,
-			boolean[][] sight, int num_trucks, int num_firemen) {
+			boolean[][] sight, int num_firemen) {
 		// TODO Auto-generated method stub
 		return null;
 	}

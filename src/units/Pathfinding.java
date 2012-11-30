@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import environment.FireAgent;
 import environment.Space;
+import environment.Zone;
 
 
 public class Pathfinding {
@@ -27,15 +28,16 @@ public class Pathfinding {
 		return min_point;
 	}
 	
-	boolean fireInRange(Point point, Space space, int range) {
+	FireAgent fireInRange(Point point, Space space, int range, boolean shuffle) {
 		Vector<Object> agents = space.agents_.getMooreNeighbors((int)point.x, (int)point.y, range, range, false);
-		Collections.shuffle(agents);
+		if(shuffle)
+			Collections.shuffle(agents);
 		for(int i = 0; i < agents.size(); ++i) {
 			if(agents.get(i).getClass() == FireAgent.class) {
-				return true;
+				return (FireAgent) agents.get(i);
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	boolean validatePoint(Point point, Space space) {
@@ -43,9 +45,9 @@ public class Pathfinding {
 		double y = point.y;
 		return x >= 0 && 
 			x < space.width_
-			&& y >= 0 && y < space.height_
-			&& (space.agents_.getObjectAt((int)x, (int)y) == null)
-			&& (!fireInRange(point, space, 3));
+			&& y >= 0 && y < space.height_;
+			//&& (space.agents_.getObjectAt((int)x, (int)y) == null);
+			//&& (fireInRange(point, space, Constants.MOVE_SAFE_DISTANCE, false) == null);
 		
 	}
 	
@@ -57,8 +59,7 @@ public class Pathfinding {
 		}
 	}
 	
-	Point[] findPath(Point source, Point target, Space space) {
-		
+	Point[] findPath(Point source, Zone target, Space space) {
 		ArrayList<Point> closed_set = new ArrayList<Point>();
 		ArrayList<Point> open_set = new ArrayList<Point>();
 		HashMap<Point, Point> came_from = new HashMap<Point, Point>();
@@ -70,7 +71,7 @@ public class Pathfinding {
 		HashMap<Point, Double> f_score = new HashMap<Point, Double>();
 		
 		g_score.put(source, 0.0);
-		h_score.put(source, heuristic(source, target));
+		h_score.put(source, heuristic(source, target.center_));
 		f_score.put(source, h_score.get(source));
 		
 		int current_index;
@@ -80,7 +81,7 @@ public class Pathfinding {
 		while(!open_set.isEmpty()) {
 			current_index = getMinScore(open_set, f_score);
 			current_point = open_set.get(current_index);
-			if(current_point.equals(target)) {
+			if(current_point.equals(target.center_)) {
 				ArrayList<Point> path = new ArrayList<Point>();
 				reconstructPath(current_point, came_from, path);
 				Collections.reverse(path);
@@ -105,7 +106,7 @@ public class Pathfinding {
 					if(!closed_set.contains(next_point)) {
 						if(!open_set.contains(next_point)) {
 							open_set.add(next_point);
-							h_score.put(next_point, heuristic(next_point, target));
+							h_score.put(next_point, heuristic(next_point, target.center_));
 							update = true;
 						}
 						else if(g_score.get(current_point) + 1 < g_score.get(next_point))

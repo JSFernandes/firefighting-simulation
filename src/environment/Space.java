@@ -14,8 +14,7 @@ import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.gui.Value2DDisplay;
 import uchicago.src.sim.space.Object2DTorus;
 import uchicago.src.sim.util.Random;
-import units.FirefightUnit;
-import units.Firefighter;
+import units.FirefighterAgent;
 
 public class Space {
 	public Object2DTorus trees_;
@@ -23,23 +22,23 @@ public class Space {
 	public int width_ = 150, height_ = 150;
 	public WindDirection wind_;
 	public boolean eightDirections = true;
-	ArrayList<Firefighter> firefighters_;
+	ArrayList<FirefighterAgent> firefighters_;
 	
 	
 	public Space() {
-//		try {
-//			trees_ = FieldMap.getMap();
-//			width_ = FieldMap.width_;
-//			height_ = FieldMap.height_;
-//			
-//			agents_ = new Object2DTorus(width_, height_);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			
+		try {
+			trees_ = FieldMap.getMap();
+			width_ = FieldMap.width_;
+			height_ = FieldMap.height_;
+			
+			agents_ = new Object2DTorus(width_, height_);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
 			trees_ = new Object2DTorus(width_, height_);
 			agents_ = new Object2DTorus(width_, height_);
 			build();
-//		}
+		}
 		
 		toFieldMap();
 		
@@ -47,8 +46,8 @@ public class Space {
 		//wind_.setStrength(3);
 		
 		
-		//startFire();
-		firefighters_ = new ArrayList<Firefighter>();
+		startFire();
+		firefighters_ = new ArrayList<FirefighterAgent>();
 	}
 
 	public void configureWind(int windDirection, int windStrength){

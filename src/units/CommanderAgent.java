@@ -7,13 +7,13 @@ import command.CommandType;
 
 import environment.FireFighterModel;
 import environment.Space;
+import environment.Zone;
 import strategy.Strategy;
 import uchicago.src.sim.engine.Stepable;
 
 
-public class Commander implements Stepable {
-	Firetruck[] trucks_;
-	public Firefighter[] units_;
+public class CommanderAgent implements Stepable {
+	public FirefighterAgent[] units_;
 	
 	FireFighterModel mod_;
 	boolean[][] sight_;
@@ -22,18 +22,21 @@ public class Commander implements Stepable {
 	
 	int time_to_decision_ = 20;
 	
-	public Commander(Firefighter[] units, FireFighterModel mod, Strategy strat) {
+	public CommanderAgent(FirefighterAgent[] units, FireFighterModel mod, Strategy strat) {
 		units_ = units;
 		mod_ = mod;
 		strat_ = strat;
-		trucks_ = new Firetruck[0];
 	}
 	
 	public void decision() {
-		ArrayList<Point> pos = strat_.determineFightersPos(mod_, sight_, trucks_.length, units_.length);
+		System.out.println("entering strategy");
+		ArrayList<Point> pos = strat_.determineFightersPos(mod_, sight_, units_.length);
+		System.out.println("exiting strategy");
 		for(int i = 0; i < pos.size(); ++i) {
-			units_[i].orders_.add(new Command(CommandType.MOVE, pos.get(i)));
-			units_[i].orders_.add(new Command(CommandType.WATER, null));
+			System.out.println("cenas");
+			System.out.println(pos.get(i));
+			units_[i].orders_.add(new Command(CommandType.MOVE, new Zone(pos.get(i))));
+			//units_[i].orders_.add(new Command(CommandType.WATER, null));
 		}
 	}
 	

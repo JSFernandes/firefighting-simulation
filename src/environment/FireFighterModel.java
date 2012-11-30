@@ -1,20 +1,23 @@
 package environment;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
 
+import strategy.FlankingStrategy;
 import strategy.FrontStrategy;
 import uchicago.src.reflector.ListPropertyDescriptor;
 import uchicago.src.reflector.PropertyWidget;
+import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.gui.Value2DDisplay;
-import units.Commander;
-import units.Firefighter;
+import units.CommanderAgent;
+import units.FirefighterAgent;
 
 public class FireFighterModel extends SimModelImpl {
 
@@ -24,7 +27,7 @@ public class FireFighterModel extends SimModelImpl {
 	public Space space_;
 	public ArrayList<FireAgent> fire_agents_;
 	protected Object2DDisplay agent_display_;
-	Commander com_;
+	CommanderAgent com_;
 
 	//PARAMS
 	private int windDirection = 0;
@@ -59,12 +62,12 @@ public class FireFighterModel extends SimModelImpl {
 
 	private void buildSchedule() {
 		schedule_.scheduleActionBeginning(0, this, "step");
-		// BasicAction b = new BasicAction() {
-		// public void execute() {
-		// space.addAgent();space.addAgent();
-		// }
-		// };
-		// schedule.scheduleActionAtInterval(1,b);
+		 BasicAction b = new BasicAction() {
+		 public void execute() {
+				space_.fireStep();
+		 }
+		 };
+		 schedule_.scheduleActionAtInterval(5,b);
 	}
 
 	private void buildDisplay() {
@@ -80,18 +83,18 @@ public class FireFighterModel extends SimModelImpl {
 
 	private void buildModel() {
 		space_ = new Space();
-		com_ = new Commander(null, this, new FrontStrategy());
-		space_.agents_.putObjectAt(30, 30, new Firefighter(30, 30, space_, com_));
-		space_.agents_.putObjectAt(30, 31, new Firefighter(30, 31, space_, com_));
-		space_.agents_.putObjectAt(31, 31, new Firefighter(31, 31, space_, com_));
-		space_.agents_.putObjectAt(31, 30, new Firefighter(31, 30, space_, com_));
-		space_.agents_.putObjectAt(30, 29, new Firefighter(30, 29, space_, com_));
-		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(30, 30));
-		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(30, 31));
-		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(31, 31));
-		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(31, 30));
-		space_.firefighters_.add((Firefighter) space_.agents_.getObjectAt(30, 29));
-		com_.units_ = space_.firefighters_.toArray(new Firefighter[space_.firefighters_.size()]);
+		com_ = new CommanderAgent(null, this, new FrontStrategy());
+		space_.agents_.putObjectAt(30, 30, new FirefighterAgent(new Point(30, 30), space_, com_));
+		space_.agents_.putObjectAt(30, 31, new FirefighterAgent(new Point(30, 31), space_, com_));
+		space_.agents_.putObjectAt(31, 31, new FirefighterAgent(new Point(31, 31), space_, com_));
+		space_.agents_.putObjectAt(31, 30, new FirefighterAgent(new Point(31, 30), space_, com_));
+		space_.agents_.putObjectAt(30, 29, new FirefighterAgent(new Point(30, 29), space_, com_));
+		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(30, 30));
+		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(30, 31));
+		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(31, 31));
+		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(31, 30));
+		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(30, 29));
+		com_.units_ = space_.firefighters_.toArray(new FirefighterAgent[space_.firefighters_.size()]);
 	}
 
 	private void initParamDropdowns(){
@@ -184,8 +187,8 @@ public class FireFighterModel extends SimModelImpl {
 	}
 
 	public void step() {
-		if(getTickCount() < 20)
-			space_.fireStep();
+		//if(getTickCount() < 20)
+		//	space_.fireStep();
 		space_.step();
 		com_.step();
 		// agentDisplay = space.getAgentDisplay();
