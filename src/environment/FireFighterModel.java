@@ -7,6 +7,7 @@ import java.util.Hashtable;
 
 import strategy.FlankingStrategy;
 import strategy.FrontStrategy;
+import strategy.QuadStrategy;
 import uchicago.src.reflector.ListPropertyDescriptor;
 import uchicago.src.reflector.PropertyWidget;
 import uchicago.src.sim.engine.BasicAction;
@@ -67,7 +68,7 @@ public class FireFighterModel extends SimModelImpl {
 				space_.fireStep();
 		 }
 		 };
-		 schedule_.scheduleActionAtInterval(5,b);
+		 schedule_.scheduleActionAtInterval(7,b);
 	}
 
 	private void buildDisplay() {
@@ -83,7 +84,7 @@ public class FireFighterModel extends SimModelImpl {
 
 	private void buildModel() {
 		space_ = new Space();
-		com_ = new CommanderAgent(null, this, new FrontStrategy());
+		com_ = new CommanderAgent(null, this, new QuadStrategy());
 		space_.agents_.putObjectAt(30, 30, new FirefighterAgent(new Point(30, 30), space_, com_));
 		space_.agents_.putObjectAt(30, 31, new FirefighterAgent(new Point(30, 31), space_, com_));
 		space_.agents_.putObjectAt(31, 31, new FirefighterAgent(new Point(31, 31), space_, com_));

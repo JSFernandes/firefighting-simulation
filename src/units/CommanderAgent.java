@@ -29,14 +29,12 @@ public class CommanderAgent implements Stepable {
 	}
 	
 	public void decision() {
-		System.out.println("entering strategy");
 		ArrayList<Point> pos = strat_.determineFightersPos(mod_, sight_, units_.length);
-		System.out.println("exiting strategy");
 		for(int i = 0; i < pos.size(); ++i) {
-			System.out.println("cenas");
-			System.out.println(pos.get(i));
+			//System.out.println(pos.get(i));
 			units_[i].orders_.add(new Command(CommandType.MOVE, new Zone(pos.get(i))));
-			//units_[i].orders_.add(new Command(CommandType.WATER, null));
+			units_[i].current_order_ = null;
+			units_[i].moving_ = false;
 		}
 	}
 	

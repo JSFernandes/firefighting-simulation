@@ -45,10 +45,9 @@ public class Pathfinding {
 		double y = point.y;
 		return x >= 0 && 
 			x < space.width_
-			&& y >= 0 && y < space.height_;
-			//&& (space.agents_.getObjectAt((int)x, (int)y) == null);
-			//&& (fireInRange(point, space, Constants.MOVE_SAFE_DISTANCE, false) == null);
-		
+			&& y >= 0 && y < space.height_
+			&& (space.agents_.getObjectAt((int)x, (int)y) == null)
+			&& (fireInRange(point, space, Constants.MOVE_SAFE_DISTANCE, false) == null);
 	}
 	
 	void reconstructPath(Point current_point, HashMap<Point, Point> came_from, ArrayList<Point> path) {
@@ -60,6 +59,11 @@ public class Pathfinding {
 	}
 	
 	Point[] findPath(Point source, Zone target, Space space) {
+		
+		if(validatePoint(target.center_, space) == false) {
+			return null;
+		}
+		
 		ArrayList<Point> closed_set = new ArrayList<Point>();
 		ArrayList<Point> open_set = new ArrayList<Point>();
 		HashMap<Point, Point> came_from = new HashMap<Point, Point>();
@@ -79,6 +83,7 @@ public class Pathfinding {
 		Point[] neighbours = new Point[8];
 		boolean update = false;
 		while(!open_set.isEmpty()) {
+			//System.out.println("inside a loop");
 			current_index = getMinScore(open_set, f_score);
 			current_point = open_set.get(current_index);
 			if(current_point.equals(target.center_)) {
@@ -88,6 +93,8 @@ public class Pathfinding {
 				return (Point[]) path.toArray(new Point[path.size()]);
 			}
 			
+			//System.out.println("open size: " + open_set.size());
+			//System.out.println("closed size: " + closed_set.size());
 			open_set.remove(current_index);
 			closed_set.add(current_point);
 			

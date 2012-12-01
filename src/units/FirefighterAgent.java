@@ -41,18 +41,18 @@ public class FirefighterAgent implements Drawable {
 		if (moving_ == true) {
 			move_step();
 		}
-		if(current_order_ == null) {
-			current_order_ = orders_.poll();
-			if(current_order_ == null)
-				autonomousStep();
+		if(autonomousStep() == false) {
+			if(current_order_ == null) {
+				current_order_ = orders_.poll();
+				if(current_order_ != null)
+					process(current_order_);
+			}
 			else
 				process(current_order_);
 		}
-		else
-			process(current_order_);
 	}
 	
-	private void autonomousStep() {
+	private boolean autonomousStep() {
 		FireAgent fire;
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.SAFE_DISTANCE, true);
 		if (fire != null) {
@@ -80,13 +80,13 @@ public class FirefighterAgent implements Drawable {
 			pos_.y = next_y;
 			space_.agents_.putObjectAt(pos_.x, pos_.y, this);
 			
-			return;
+			return true;
 		}
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_WATER_RANGE, true);
 	    if (fire != null) {
 	    	//FIXME código para apagar fogo
 	    	space_.agents_.putObjectAt(fire.getX(), fire.getY(), null);
-			return;
+			return true;
 		}
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_VISION_RADIUS, true);
 		if (fire != null) {
@@ -120,8 +120,10 @@ public class FirefighterAgent implements Drawable {
 			pos_.y = next_y;
 			space_.agents_.putObjectAt(pos_.x, pos_.y, this);
 			
-			return;
+			return true;
 		}
+		
+		return false;
 		
 		//TODO e se nem vir fogo?????????????????????
 		
@@ -136,6 +138,8 @@ public class FirefighterAgent implements Drawable {
 			pos_.y = (int) move_path_[next_path_point_ - 1].getY();
 			space_.agents_.putObjectAt(pos_.x, pos_.y, this);
 			move_path_ = pathfinding_algorithm_.findPath(new Point(pos_.x, pos_.y), new Zone(move_path_[move_path_.length - 1]), space_);
+			if(move_path_ == null)
+				leader_.decision();
 			next_path_point_ = 0;
 			return;
 		}
@@ -162,12 +166,15 @@ public class FirefighterAgent implements Drawable {
 	private void process(Command order) {
 		switch(order.type_) {
 			case MOVE:
-				System.out.println("starting movement");
+				//System.out.println("starting movement");
 				moving_ = true;
 				move_path_ = pathfinding_algorithm_.findPath(pos_, order.target_, space_);
-				System.out.println("CRASHO NO PATHFINDING BABY");
+				if(move_path_ == null) {
+					leader_.decision();
+					return;
+				}
 				next_path_point_ = 0;
-				System.out.println("starting steps");
+				//System.out.println("starting steps");
 				move_step();
 			break;
 			case WATER:
