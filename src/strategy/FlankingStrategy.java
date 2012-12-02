@@ -68,18 +68,13 @@ public class FlankingStrategy extends Strategy {
 	}
 
 	@Override
-	public ArrayList<Point> determineFightersPos(FireFighterModel model,
+	public ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model,
 			boolean[][] sight, int num_firemen) {
 		FireExtremes extremes = new FireExtremes(model);
 		
 		Line[] lines = determineFlankLines(extremes, model.space_.wind_, num_firemen);
 		
-		ArrayList<Point> first_line = attributeFighters(num_firemen/2, lines[0]);
-		ArrayList<Point> second_line = attributeFighters(num_firemen/2, lines[1]);
-		
-		first_line.addAll(second_line);
-		
-		return first_line;
+		return attributeFighters(num_firemen, lines, model.space_.width_, model.space_.height_, extremes);
 	}
 
 }

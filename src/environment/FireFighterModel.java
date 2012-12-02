@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 
+import strategy.CenterStrategy;
 import strategy.FlankingStrategy;
 import strategy.FrontStrategy;
 import strategy.QuadStrategy;
@@ -84,7 +85,7 @@ public class FireFighterModel extends SimModelImpl {
 
 	private void buildModel() {
 		space_ = new Space();
-		com_ = new CommanderAgent(null, this, new QuadStrategy());
+		com_ = new CommanderAgent(null, this, new FrontStrategy());
 		space_.agents_.putObjectAt(30, 30, new FirefighterAgent(new Point(30, 30), space_, com_));
 		space_.agents_.putObjectAt(30, 31, new FirefighterAgent(new Point(30, 31), space_, com_));
 		space_.agents_.putObjectAt(31, 31, new FirefighterAgent(new Point(31, 31), space_, com_));

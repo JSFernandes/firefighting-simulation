@@ -40,7 +40,7 @@ public class Pathfinding {
 		return null;
 	}
 	
-	boolean validatePoint(Point point, Space space) {
+	public boolean validatePoint(Point point, Space space) {
 		double x = point.x;
 		double y = point.y;
 		return x >= 0 && 
@@ -61,6 +61,7 @@ public class Pathfinding {
 	Point[] findPath(Point source, Zone target, Space space) {
 		
 		if(validatePoint(target.center_, space) == false) {
+			System.out.println("fug");
 			return null;
 		}
 		

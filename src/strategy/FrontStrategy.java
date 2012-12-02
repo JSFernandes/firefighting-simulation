@@ -74,13 +74,14 @@ public class FrontStrategy extends Strategy {
 	}
 	
 	@Override
-	public ArrayList<Point> determineFightersPos(FireFighterModel model,
+	public ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model,
 			boolean[][] sight, int num_firemen) {
 		FireExtremes extremes = new FireExtremes(model);
 		
 		Line l = determineLine(extremes, model.space_.wind_, num_firemen);
+		Line[] line_array = {l};
 		
-		return attributeFighters(num_firemen, l);
+		return attributeFighters(num_firemen, line_array, model.space_.width_, model.space_.height_, extremes);
 	}
 
 

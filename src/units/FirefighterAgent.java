@@ -19,6 +19,7 @@ public class FirefighterAgent implements Drawable {
 	Point pos_;
 	Space space_; // back links to our space and model objects
 	//protected FireFighterModel model_;
+	Squad squad_;
 	
 	LinkedList<Command> orders_;
 	CommanderAgent leader_;
@@ -41,20 +42,26 @@ public class FirefighterAgent implements Drawable {
 		if (moving_ == true) {
 			move_step();
 		}
-		if(autonomousStep() == false) {
+		else if(autonomousStep() == false) {
 			if(current_order_ == null) {
 				current_order_ = orders_.poll();
 				if(current_order_ != null)
 					process(current_order_);
+				else if(squad_ != null)
+					squad_.getThingsToDo(this, leader_);
 			}
 			else
 				process(current_order_);
 		}
 	}
 	
+	boolean coordsInRange(Point p, Space s) {
+		return (p.x >= 0 && p.y >= 0 && p.y < s.height_ && p.x < s.width_);
+	}
+	
 	private boolean autonomousStep() {
 		FireAgent fire;
-		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.SAFE_DISTANCE, true);
+		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.SAFE_DISTANCE, false);
 		if (fire != null) {
 			int fire_x = fire.getX();
 			int fire_y = fire.getY();
@@ -74,11 +81,12 @@ public class FirefighterAgent implements Drawable {
 			else {
 				next_x = pos_.x + 1;
 			}
-			
-			space_.agents_.putObjectAt(pos_.x, pos_.y, null);
-			pos_.x = next_x;
-			pos_.y = next_y;
-			space_.agents_.putObjectAt(pos_.x, pos_.y, this);
+			if(coordsInRange(new Point(next_x, next_y), space_) && space_.agents_.getObjectAt(next_x, next_y) == null) {
+				space_.agents_.putObjectAt(pos_.x, pos_.y, null);
+				pos_.x = next_x;
+				pos_.y = next_y;
+				space_.agents_.putObjectAt(pos_.x, pos_.y, this);
+			}
 			
 			return true;
 		}
@@ -115,10 +123,15 @@ public class FirefighterAgent implements Drawable {
 				next_x = pos_.x;
 			}
 			
-			space_.agents_.putObjectAt(pos_.x, pos_.y, null);
-			pos_.x = next_x;
-			pos_.y = next_y;
-			space_.agents_.putObjectAt(pos_.x, pos_.y, this);
+			if(squad_ != null && squad_.isInRange(new Point(next_x, next_y)) 
+					&& coordsInRange(new Point(next_x, next_y), space_) &&
+					space_.agents_.getObjectAt(next_x, next_y) == null) {
+				space_.agents_.putObjectAt(pos_.x, pos_.y, null);
+				pos_.x = next_x;
+				pos_.y = next_y;
+				space_.agents_.putObjectAt(pos_.x, pos_.y, this);
+			}
+			//TODO else????
 			
 			return true;
 		}
@@ -134,10 +147,15 @@ public class FirefighterAgent implements Drawable {
 		pos_.x = move_path_[next_path_point_].x;
 		pos_.y = move_path_[next_path_point_].y;
 		if(space_.agents_.getObjectAt(pos_.x, pos_.y) != null) {
+			System.out.println("oh woops " + pos_);
+			System.out.println("next path point " + move_path_[next_path_point_]);
+			System.out.println("current path point " + move_path_[next_path_point_-1]);
 			pos_.x = (int) move_path_[next_path_point_ - 1].getX();
 			pos_.y = (int) move_path_[next_path_point_ - 1].getY();
 			space_.agents_.putObjectAt(pos_.x, pos_.y, this);
+			System.out.println("back to " + pos_);
 			move_path_ = pathfinding_algorithm_.findPath(new Point(pos_.x, pos_.y), new Zone(move_path_[move_path_.length - 1]), space_);
+			System.out.println("I have a new path");
 			if(move_path_ == null)
 				leader_.decision();
 			next_path_point_ = 0;
@@ -150,37 +168,19 @@ public class FirefighterAgent implements Drawable {
 			current_order_ = null;
 		}
 	}
-	
-	public void water_step() {
-		Vector<Object> agents = space_.agents_.getMooreNeighbors(pos_.x, pos_.y, Constants.DEFAULT_WATER_RANGE, Constants.DEFAULT_WATER_RANGE, false);
-		Collections.shuffle(agents);
-		for(int i = 0; i < agents.size(); ++i) {
-			if(agents.get(i).getClass() == FireAgent.class) {
-				space_.agents_.putObjectAt(((FireAgent)agents.get(i)).getX(), ((FireAgent)agents.get(i)).getY(), null);
-				return;
-			}
-		}
-		leader_.new_orders();
-	}
 
 	private void process(Command order) {
-		switch(order.type_) {
-			case MOVE:
-				//System.out.println("starting movement");
-				moving_ = true;
-				move_path_ = pathfinding_algorithm_.findPath(pos_, order.target_, space_);
-				if(move_path_ == null) {
-					leader_.decision();
-					return;
-				}
-				next_path_point_ = 0;
-				//System.out.println("starting steps");
-				move_step();
-			break;
-			case WATER:
-				water_step();
-			break;
+		moving_ = true;
+		current_order_ = order;
+		System.out.println("nonsense");
+		move_path_ = pathfinding_algorithm_.findPath(pos_, order.target_, space_);
+		if(move_path_ == null) {
+			leader_.decision();
+			return;
 		}
+		next_path_point_ = 0;
+		//System.out.println("starting steps");
+		move_step();
 	}
 
 	@Override
@@ -196,6 +196,20 @@ public class FirefighterAgent implements Drawable {
 	@Override
 	public int getY() {
 		return pos_.y;
+	}
+	
+	public void getNewOrder() {
+		Point p = squad_.findPointInNeed();
+		if (p == null) {
+			squad_.relocateSquad(leader_);
+		}
+		else {
+			orders_.add(new Command(new Zone(p)));
+		}
+	}
+	
+	public boolean seesFire() {
+		return (pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_VISION_RADIUS, false) != null);
 	}
 
 

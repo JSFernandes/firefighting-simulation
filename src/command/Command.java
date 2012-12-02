@@ -6,11 +6,9 @@ import environment.Zone;
 
 public class Command {
 	
-	public CommandType type_;
 	public Zone target_;
 	
-	public Command(CommandType type, Zone target) {
-		type_ = type;
+	public Command(Zone target) {
 		target_ = target;
 	}
 
