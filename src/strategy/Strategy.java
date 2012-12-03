@@ -10,7 +10,7 @@ import environment.Space;
 
 public abstract class Strategy {
 
-	public abstract ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model, boolean[][] sight, int num_firemen);
+	public abstract ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model, int num_firemen);
 	
 	ArrayList<ArrayList<Point>> attributeFighters(int num_firemen, Line[] lines, int width, int height, FireExtremes xtr) {
 		ArrayList<ArrayList<Point>> positions_array = new ArrayList<ArrayList<Point>>();

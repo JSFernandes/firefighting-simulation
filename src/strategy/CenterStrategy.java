@@ -80,8 +80,7 @@ public class CenterStrategy extends Strategy {
 	}
 	
 	@Override
-	public ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model,
-			boolean[][] sight, int num_firemen) {
+	public ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model, int num_firemen) {
 		FireExtremes extremes = new FireExtremes(model);
 		
 		Point center = new Point((extremes.max_x_ + extremes.min_x_)/2, (extremes.max_y_ + extremes.min_y_)/2);

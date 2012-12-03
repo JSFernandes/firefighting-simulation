@@ -17,16 +17,17 @@ public class Squad {
 		return true;
 	}
 	
-	public Point findPointInNeed() {
+	public Point findPointInNeed(FirefighterAgent agent_asking) {
 		for(int i = 0; i < firemen_.size(); ++i)
-			if(firemen_.get(i).seesFire())
+			//if(firemen_.get(i).seesFire() && firemen_.get(i) != agent_asking)
+			if(firemen_.get(i) != agent_asking)
 				return firemen_.get(i).pos_;
 		
 		return null;
 	}
 	
 	public void getThingsToDo(FirefighterAgent agent, CommanderAgent leader) {
-		Point p = findPointInNeed();
+		Point p = findPointInNeed(agent);
 		if(p != null) {
 			agent.orders_.add(new Command(new Zone(p)));
 		}
@@ -36,7 +37,7 @@ public class Squad {
 	}
 	
 	public void relocateSquad(CommanderAgent leader) {
-		Point need_point = leader.findPointInNeed();
+		Point need_point = leader.findPointInNeed(null);
 		for(int i = 0; i < firemen_.size(); ++i) {
 			firemen_.get(i).orders_.add(new Command(new Zone(need_point)));
 		}

@@ -15,13 +15,12 @@ public class CommanderAgent implements Stepable {
 	public FirefighterAgent[] units_;
 	
 	FireFighterModel mod_;
-	boolean[][] sight_;
 	
 	Strategy strat_;
 	
 	ArrayList<Squad> squads_;
 	
-	int time_to_decision_ = 20;
+	int time_to_decision_ = 100;
 	
 	public CommanderAgent(FirefighterAgent[] units, FireFighterModel mod, Strategy strat) {
 		units_ = units;
@@ -32,7 +31,7 @@ public class CommanderAgent implements Stepable {
 	}
 	
 	public void decision() {
-		ArrayList<ArrayList<Point>> pos = strat_.determineFightersPos(mod_, sight_, units_.length);
+		ArrayList<ArrayList<Point>> pos = strat_.determineFightersPos(mod_, units_.length);
 		Squad sq;
 		int current_u = 0;
 		for(int x = 0; x < pos.size(); ++x) {
@@ -65,10 +64,10 @@ public class CommanderAgent implements Stepable {
 		}
 	}
 	
-	public Point findPointInNeed() {
+	public Point findPointInNeed(FirefighterAgent agent) {
 		Point need_point = null;
 		for(int i = 0; i < squads_.size(); ++i) {
-			need_point = squads_.get(i).findPointInNeed();
+			need_point = squads_.get(i).findPointInNeed(agent);
 			if(need_point != null)
 				return need_point;
 		}

@@ -58,6 +58,8 @@ public class FireAgent implements Drawable {
 	
 	public void extinguish(){
 		--fire_intensity_;
+		if(fire_intensity_ <= 0)
+			space_.agents_.putObjectAt(x_, y_, null);
 	}
 	
 	public void step() {

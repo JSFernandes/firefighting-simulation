@@ -68,18 +68,28 @@ public class FireFighterModel extends SimModelImpl {
 		buildSchedule();
 		
 		configureWind();
+		setExtinguishStrategy(strategy);
+		configureStrategy();
 		
 		display_surface_.display();
 	}
 
 	private void buildSchedule() {
-		schedule_.scheduleActionBeginning(0, this, "step");
+		 schedule_.scheduleActionBeginning(0, this, "step");
 		 BasicAction b = new BasicAction() {
 		 public void execute() {
 				space_.fireStep();
 		 	}	
 		 };
-		 schedule_.scheduleActionAtInterval(7,b);
+		 
+		 schedule_.scheduleActionAtInterval(22,b);
+		 
+		 BasicAction c = new BasicAction() {
+		 public void execute() {
+			 	space_.step();
+		 	}
+		 };
+		 schedule_.scheduleActionAtInterval(2, c);
 	}
 
 	private void buildDisplay() {
@@ -235,7 +245,7 @@ public class FireFighterModel extends SimModelImpl {
 	public void step() {
 		//if(getTickCount() < 20)
 		//	space_.fireStep();
-		space_.step();
+		//space_.step();
 		com_.step();
 		// agentDisplay = space.getAgentDisplay();
 		display_surface_.updateDisplay();

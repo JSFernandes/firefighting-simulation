@@ -47,8 +47,11 @@ public class FirefighterAgent implements Drawable {
 				current_order_ = orders_.poll();
 				if(current_order_ != null)
 					process(current_order_);
-				else if(squad_ != null)
+				else if(squad_ != null) {
 					squad_.getThingsToDo(this, leader_);
+					if(orders_.size() == 0)
+						leader_.decision();
+				}
 			}
 			else
 				process(current_order_);
@@ -92,8 +95,6 @@ public class FirefighterAgent implements Drawable {
 		}
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_WATER_RANGE, true);
 	    if (fire != null) {
-	    	//FIXME código para apagar fogo
-	    	
 	    	((FireAgent) space_.agents_.getObjectAt(fire.getX(), fire.getY())).extinguish();
 			return true;
 		}
@@ -124,13 +125,17 @@ public class FirefighterAgent implements Drawable {
 				next_x = pos_.x;
 			}
 			
-			if(squad_ != null && squad_.isInRange(new Point(next_x, next_y)) 
-					&& coordsInRange(new Point(next_x, next_y), space_) &&
+			if(coordsInRange(new Point(next_x, next_y), space_) &&
 					space_.agents_.getObjectAt(next_x, next_y) == null) {
-				space_.agents_.putObjectAt(pos_.x, pos_.y, null);
-				pos_.x = next_x;
-				pos_.y = next_y;
-				space_.agents_.putObjectAt(pos_.x, pos_.y, this);
+				if((squad_ != null && squad_.isInRange(new Point(next_x, next_y))) || squad_ == null) {
+					space_.agents_.putObjectAt(pos_.x, pos_.y, null);
+					pos_.x = next_x;
+					pos_.y = next_y;
+					space_.agents_.putObjectAt(pos_.x, pos_.y, this);
+				}
+				else if(squad_ != null) {
+					squad_.getThingsToDo(this, leader_);
+				}
 			}
 			//TODO else????
 			
@@ -197,16 +202,6 @@ public class FirefighterAgent implements Drawable {
 	@Override
 	public int getY() {
 		return pos_.y;
-	}
-	
-	public void getNewOrder() {
-		Point p = squad_.findPointInNeed();
-		if (p == null) {
-			squad_.relocateSquad(leader_);
-		}
-		else {
-			orders_.add(new Command(new Zone(p)));
-		}
 	}
 	
 	public boolean seesFire() {

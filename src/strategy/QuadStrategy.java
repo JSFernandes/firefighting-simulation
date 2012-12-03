@@ -41,8 +41,7 @@ public class QuadStrategy extends Strategy {
 		return lines;
 	}
 	
-	public ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model,
-			boolean[][] sight, int num_firemen) {
+	public ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model,int num_firemen) {
 		FireExtremes extremes = new FireExtremes(model);
 		Line[] lines = determineLines(extremes, num_firemen);
 		System.out.println("no prob");
