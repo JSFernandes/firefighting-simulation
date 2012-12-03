@@ -75,4 +75,8 @@ public class CommanderAgent implements Stepable {
 		return null;
 	}
 
+	public void configureStrategy(Strategy s) {
+		strat_ = s;
+	}
+
 }

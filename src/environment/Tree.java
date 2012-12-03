@@ -62,7 +62,8 @@ public class Tree extends java.lang.Number {
 			else
 				return false;
 		}
-		else {
+		else 
+		{
 			//int d = (life/initLife)*density;
 			life-=(5-density)*FireFighterModel.spreadMultiplier;
 			if(life<=0){

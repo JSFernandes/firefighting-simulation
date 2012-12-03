@@ -11,7 +11,7 @@ public class FireAgent implements Drawable {
 	protected int x_, y_; // current coordinates in space
 	protected Space space_; // back links to our space and model objects
 	protected FireFighterModel model_;
-	protected int fire_intensity_;
+	protected int fire_intensity_,max_fire_intensity_;
 	private double incenerating_prob_;
 
 	public FireAgent(int x, int y, Space space) {
@@ -19,7 +19,7 @@ public class FireAgent implements Drawable {
 		y_ = y;
 		
 		space_ = space;
-		fire_intensity_ = 1;
+		fire_intensity_ = max_fire_intensity_ = 2;
 	}
 
 
@@ -56,6 +56,10 @@ public class FireAgent implements Drawable {
 		return winds[i];
 	}
 	
+	public void extinguish(){
+		--fire_intensity_;
+	}
+	
 	public void step() {
 		Tree tt = (Tree) space_.trees_.getObjectAt(x_, y_);
 
@@ -63,6 +67,7 @@ public class FireAgent implements Drawable {
 			fire_intensity_ = 0;
 		}
 
+		if(fire_intensity_ == max_fire_intensity_){
 		ArrayList<Tree> v = space_.getNeighbors(x_, y_);
 
 		for (int i = 0; i < v.size(); ++i) {
@@ -85,6 +90,7 @@ public class FireAgent implements Drawable {
 						break;
 				}
 			}
+		}
 		}
 		// space.addAgent(x, y);
 	}

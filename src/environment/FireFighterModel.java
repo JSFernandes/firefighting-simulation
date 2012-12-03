@@ -9,6 +9,7 @@ import strategy.CenterStrategy;
 import strategy.FlankingStrategy;
 import strategy.FrontStrategy;
 import strategy.QuadStrategy;
+import strategy.Strategy;
 import uchicago.src.reflector.ListPropertyDescriptor;
 import uchicago.src.reflector.PropertyWidget;
 import uchicago.src.sim.engine.BasicAction;
@@ -29,11 +30,13 @@ public class FireFighterModel extends SimModelImpl {
 	public Space space_;
 	public ArrayList<FireAgent> fire_agents_;
 	protected Object2DDisplay agent_display_;
-	CommanderAgent com_;
+	private CommanderAgent com_;
+	private Strategy agentStrategy;
 
 	//PARAMS
 	private int windDirection = 0;
 	private int windStrength = 2;
+	private int strategy = 0;
 	public static int spreadMultiplier = 3;
 	public static int burnMultiplier = 3;
 	
@@ -52,6 +55,13 @@ public class FireFighterModel extends SimModelImpl {
 			space_.configureWind(windDirection,windStrength);
 	}
 	
+	
+	private void configureStrategy() {
+		if(com_ != null)
+			com_.configureStrategy(agentStrategy);
+		
+	}
+	
 	public void begin() {
 		buildModel();
 		buildDisplay();
@@ -67,7 +77,7 @@ public class FireFighterModel extends SimModelImpl {
 		 BasicAction b = new BasicAction() {
 		 public void execute() {
 				space_.fireStep();
-		 }
+		 	}	
 		 };
 		 schedule_.scheduleActionAtInterval(7,b);
 	}
@@ -85,7 +95,7 @@ public class FireFighterModel extends SimModelImpl {
 
 	private void buildModel() {
 		space_ = new Space();
-		com_ = new CommanderAgent(null, this, new FrontStrategy());
+		com_ = new CommanderAgent(null, this, agentStrategy);
 		space_.agents_.putObjectAt(30, 30, new FirefighterAgent(new Point(30, 30), space_, com_));
 		space_.agents_.putObjectAt(30, 31, new FirefighterAgent(new Point(30, 31), space_, com_));
 		space_.agents_.putObjectAt(31, 31, new FirefighterAgent(new Point(31, 31), space_, com_));
@@ -113,6 +123,15 @@ public class FireFighterModel extends SimModelImpl {
 		
 		
 		descriptors.put("WindDirection", pd);
+		
+		Hashtable<Integer,String> h2 = new Hashtable<Integer,String>();
+		h2.put(new Integer(0), "Front");
+		h2.put(new Integer(1), "Flanking");
+		h2.put(new Integer(2), "Quad");
+		h2.put(new Integer(3), "Center");
+		ListPropertyDescriptor pd2 = new ListPropertyDescriptor("ExtinguishStrategy", h2);
+		
+		descriptors.put("ExtinguishStrategy", pd2);
 //		System.out.println(pd.getWidget().getValue());
 //		pd.getWidget().setValue(5);
 //		System.out.println(pd.getWidget().getValue());
@@ -120,7 +139,7 @@ public class FireFighterModel extends SimModelImpl {
 	}
 	
 	public String[] getInitParam() {
-		String[] params = { "WindDirection", "WindStrength", "SpreadMultiplier", "BurnMultiplier" };	
+		String[] params = { "WindDirection", "WindStrength", "SpreadMultiplier", "BurnMultiplier", "ExtinguishStrategy" };	
 		
 		return params;
 	}
@@ -150,6 +169,31 @@ public class FireFighterModel extends SimModelImpl {
 		return windDirection;
 	}
 	
+	public int getExtinguishStrategy(){
+		return strategy;
+	}
+	
+	public void setExtinguishStrategy(int a){
+		strategy = a;
+		switch (strategy) {
+		case 0:
+			agentStrategy = new FrontStrategy();
+			break;
+		case 1:
+			agentStrategy = new FlankingStrategy();
+			break;
+		case 2:
+			agentStrategy = new QuadStrategy();
+			break;
+		case 3:
+			agentStrategy = new CenterStrategy();
+			break;
+		default:
+			break;
+		}
+		configureStrategy();
+	}
+
 	public void setWindStrength(int a){
 		windStrength =  a;
 		configureWind();

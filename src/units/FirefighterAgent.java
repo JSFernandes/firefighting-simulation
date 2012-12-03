@@ -93,7 +93,8 @@ public class FirefighterAgent implements Drawable {
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_WATER_RANGE, true);
 	    if (fire != null) {
 	    	//FIXME código para apagar fogo
-	    	space_.agents_.putObjectAt(fire.getX(), fire.getY(), null);
+	    	
+	    	((FireAgent) space_.agents_.getObjectAt(fire.getX(), fire.getY())).extinguish();
 			return true;
 		}
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_VISION_RADIUS, true);

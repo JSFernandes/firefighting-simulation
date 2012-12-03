@@ -65,7 +65,7 @@ public class Space {
 		x = Random.uniform.nextIntFromTo(0, width_ - 1);
 		y = Random.uniform.nextIntFromTo(0, height_ - 1);
 		FireAgent fire_agent = new FireAgent(x, y, this);
-		fire_agent.fire_intensity_ = 1;
+		//fire_agent.fire_intensity_ = 1;
 		agents_.putObjectAt(x, y, fire_agent);
 	}
 
@@ -153,7 +153,7 @@ public class Space {
 			
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} */
 	}
