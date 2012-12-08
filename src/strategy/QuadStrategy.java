@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import units.Constants;
 
 import environment.FireFighterModel;
-import environment.Space;
 
 public class QuadStrategy extends Strategy {
 
@@ -44,7 +43,7 @@ public class QuadStrategy extends Strategy {
 	public ArrayList<ArrayList<Point>> determineFightersPos(FireFighterModel model,int num_firemen) {
 		FireExtremes extremes = new FireExtremes(model);
 		Line[] lines = determineLines(extremes, num_firemen);
-		System.out.println("no prob");
+		
 		return attributeFighters(num_firemen, lines, model.space_.width_, model.space_.height_, extremes);
 	}
 

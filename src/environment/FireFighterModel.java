@@ -11,7 +11,6 @@ import strategy.FrontStrategy;
 import strategy.QuadStrategy;
 import strategy.Strategy;
 import uchicago.src.reflector.ListPropertyDescriptor;
-import uchicago.src.reflector.PropertyWidget;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
@@ -28,7 +27,7 @@ public class FireFighterModel extends SimModelImpl {
 
 	protected Schedule schedule_;
 	public Space space_;
-	public ArrayList<FireAgent> fire_agents_;
+	public ArrayList<FireManipulator> fire_agents_;
 	protected Object2DDisplay agent_display_;
 	private CommanderAgent com_;
 	private Strategy agentStrategy;

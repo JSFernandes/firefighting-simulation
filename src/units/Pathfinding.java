@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 
-import environment.FireAgent;
+import environment.FireManipulator;
 import environment.Space;
 import environment.Zone;
 
@@ -28,13 +28,13 @@ public class Pathfinding {
 		return min_point;
 	}
 	
-	FireAgent fireInRange(Point point, Space space, int range, boolean shuffle) {
+	FireManipulator fireInRange(Point point, Space space, int range, boolean shuffle) {
 		Vector<Object> agents = space.agents_.getMooreNeighbors((int)point.x, (int)point.y, range, range, false);
 		if(shuffle)
 			Collections.shuffle(agents);
 		for(int i = 0; i < agents.size(); ++i) {
-			if(agents.get(i).getClass() == FireAgent.class) {
-				return (FireAgent) agents.get(i);
+			if(agents.get(i).getClass() == FireManipulator.class) {
+				return (FireManipulator) agents.get(i);
 			}
 		}
 		return null;
@@ -61,7 +61,6 @@ public class Pathfinding {
 	Point[] findPath(Point source, Zone target, Space space) {
 		
 		if(validatePoint(target.center_, space) == false) {
-			System.out.println("fug");
 			return null;
 		}
 		

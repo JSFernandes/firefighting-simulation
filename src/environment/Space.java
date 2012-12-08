@@ -3,8 +3,6 @@ package environment;
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -64,13 +62,13 @@ public class Space {
 		int x, y;
 		x = Random.uniform.nextIntFromTo(0, width_ - 1);
 		y = Random.uniform.nextIntFromTo(0, height_ - 1);
-		FireAgent fire_agent = new FireAgent(x, y, this);
+		FireManipulator fire_agent = new FireManipulator(x, y, this);
 		//fire_agent.fire_intensity_ = 1;
 		agents_.putObjectAt(x, y, fire_agent);
 	}
 
 	public void addAgent(int x, int y) {
-		agents_.putObjectAt(x, y, new FireAgent(x, y, this));
+		agents_.putObjectAt(x, y, new FireManipulator(x, y, this));
 	}
 
 	void toFieldMap(){
@@ -211,17 +209,17 @@ public class Space {
 	}
 
 	public void fireStep() {
-		ArrayList<FireAgent> agents = new ArrayList<FireAgent>();
+		ArrayList<FireManipulator> agents = new ArrayList<FireManipulator>();
 		BaseMatrix m = agents_.getMatrix();
 		for (int i = 0; i < width_; ++i)
 			for (int j = 0; j < height_; ++j)
-				if (m.get(i,j) != null && m.get(i, j).getClass().equals(FireAgent.class))
-					agents.add((FireAgent) m.get(i, j));
+				if (m.get(i,j) != null && m.get(i, j).getClass().equals(FireManipulator.class))
+					agents.add((FireManipulator) m.get(i, j));
 
 		// SimUtilities.shuffle( agents );
 		int siz = agents.size();
 
-		FireAgent agent;
+		FireManipulator agent;
 		for (int i = 0; i < siz; ++i) {
 			agent = agents.get(i);
 			if (agent.fire_intensity_ <= 0) {

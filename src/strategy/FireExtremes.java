@@ -1,6 +1,6 @@
 package strategy;
 
-import environment.FireAgent;
+import environment.FireManipulator;
 import environment.FireFighterModel;
 
 public class FireExtremes {
@@ -16,7 +16,8 @@ public class FireExtremes {
 		
 		for(int x = 0; x < model.space_.agents_.getSizeX(); ++x) {
 			for(int y = 0; y < model.space_.agents_.getSizeY(); ++y) {
-				if(model.space_.agents_.getObjectAt(x, y) != null && model.space_.agents_.getObjectAt(x, y).getClass() == FireAgent.class) {
+				if(model.space_.agents_.getObjectAt(x, y) != null && 
+						model.space_.agents_.getObjectAt(x, y).getClass() == FireManipulator.class) {
 					if(x < min_x_)
 						min_x_ = x;
 					if(x > max_x_)

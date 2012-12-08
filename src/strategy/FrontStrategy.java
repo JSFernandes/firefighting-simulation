@@ -3,9 +3,7 @@ package strategy;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import environment.FireAgent;
 import environment.FireFighterModel;
-import environment.Space;
 import environment.WindDirection;
 
 public class FrontStrategy extends Strategy {

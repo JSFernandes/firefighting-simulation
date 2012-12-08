@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import units.Constants;
 
 import environment.FireFighterModel;
-import environment.Space;
 
 public abstract class Strategy {
 
@@ -30,7 +29,6 @@ public abstract class Strategy {
 		
 		for(int i = 0; i < lines.length; ++i) {
 			line = lines[i];
-			System.out.println("center: " + line.center_);
 			if(line.center_.x < 0 || line.center_.y < 0 || line.center_.x >= width || line.center_.y >= height) {
 				return replaceLine(line, width, height, num_firemen, xtr);
 			}

@@ -1,13 +1,10 @@
 package units;
 import java.awt.Point;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Vector;
 
 import command.Command;
 
-import environment.FireAgent;
-import environment.FireFighterModel;
+import environment.FireManipulator;
 import environment.Space;
 import environment.Zone;
 import uchicago.src.sim.gui.Drawable;
@@ -18,7 +15,6 @@ public class FirefighterAgent implements Drawable {
 	
 	Point pos_;
 	Space space_; // back links to our space and model objects
-	//protected FireFighterModel model_;
 	Squad squad_;
 	
 	LinkedList<Command> orders_;
@@ -32,7 +28,6 @@ public class FirefighterAgent implements Drawable {
 	public FirefighterAgent(Point p, Space space, CommanderAgent leader) {
 		pos_ = (Point) p.clone();
 		space_ = space;
-		//model_ = model;
 		orders_ = new LinkedList<Command>();
 		moving_ = false;
 		leader_ = leader;
@@ -63,7 +58,7 @@ public class FirefighterAgent implements Drawable {
 	}
 	
 	private boolean autonomousStep() {
-		FireAgent fire;
+		FireManipulator fire;
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.SAFE_DISTANCE, false);
 		if (fire != null) {
 			int fire_x = fire.getX();
@@ -93,11 +88,13 @@ public class FirefighterAgent implements Drawable {
 			
 			return true;
 		}
+		
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_WATER_RANGE, true);
 	    if (fire != null) {
-	    	((FireAgent) space_.agents_.getObjectAt(fire.getX(), fire.getY())).extinguish();
+	    	((FireManipulator) space_.agents_.getObjectAt(fire.getX(), fire.getY())).extinguish();
 			return true;
 		}
+	    
 		fire = pathfinding_algorithm_.fireInRange(pos_, space_, Constants.DEFAULT_VISION_RADIUS, true);
 		if (fire != null) {
 			int fire_x = fire.getX();
@@ -127,24 +124,21 @@ public class FirefighterAgent implements Drawable {
 			
 			if(coordsInRange(new Point(next_x, next_y), space_) &&
 					space_.agents_.getObjectAt(next_x, next_y) == null) {
-				if((squad_ != null && squad_.isInRange(new Point(next_x, next_y))) || squad_ == null) {
+				//if((squad_ != null && squad_.isInRange(new Point(next_x, next_y))) || squad_ == null) {
 					space_.agents_.putObjectAt(pos_.x, pos_.y, null);
 					pos_.x = next_x;
 					pos_.y = next_y;
 					space_.agents_.putObjectAt(pos_.x, pos_.y, this);
-				}
-				else if(squad_ != null) {
-					squad_.getThingsToDo(this, leader_);
-				}
+				//}
+				//else if(squad_ != null) {
+					//squad_.getThingsToDo(this, leader_);
+				//}
 			}
-			//TODO else????
 			
 			return true;
 		}
 		
 		return false;
-		
-		//TODO e se nem vir fogo?????????????????????
 		
 	}
 
@@ -152,16 +146,11 @@ public class FirefighterAgent implements Drawable {
 		space_.agents_.putObjectAt(pos_.x, pos_.y, null);
 		pos_.x = move_path_[next_path_point_].x;
 		pos_.y = move_path_[next_path_point_].y;
-		if(space_.agents_.getObjectAt(pos_.x, pos_.y) != null) {
-			System.out.println("oh woops " + pos_);
-			System.out.println("next path point " + move_path_[next_path_point_]);
-			System.out.println("current path point " + move_path_[next_path_point_-1]);
+		if(!pathfinding_algorithm_.validatePoint(pos_, space_)) {
 			pos_.x = (int) move_path_[next_path_point_ - 1].getX();
 			pos_.y = (int) move_path_[next_path_point_ - 1].getY();
 			space_.agents_.putObjectAt(pos_.x, pos_.y, this);
-			System.out.println("back to " + pos_);
 			move_path_ = pathfinding_algorithm_.findPath(new Point(pos_.x, pos_.y), new Zone(move_path_[move_path_.length - 1]), space_);
-			System.out.println("I have a new path");
 			if(move_path_ == null)
 				leader_.decision();
 			next_path_point_ = 0;
@@ -178,14 +167,12 @@ public class FirefighterAgent implements Drawable {
 	private void process(Command order) {
 		moving_ = true;
 		current_order_ = order;
-		System.out.println("nonsense");
 		move_path_ = pathfinding_algorithm_.findPath(pos_, order.target_, space_);
 		if(move_path_ == null) {
 			leader_.decision();
 			return;
 		}
 		next_path_point_ = 0;
-		//System.out.println("starting steps");
 		move_step();
 	}
 

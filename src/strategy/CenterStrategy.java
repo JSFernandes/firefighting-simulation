@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import units.Constants;
 
 import environment.FireFighterModel;
-import environment.Space;
 import environment.WindDirection;
 
 public class CenterStrategy extends Strategy {
@@ -24,12 +23,9 @@ public class CenterStrategy extends Strategy {
 				candidates.add(center_array[i]);
 			}
 			else if(distance == min_distance) {
-				//System.out.println("what are the odds");
 				candidates.add(center_array[i]);
 			}
 		}
-		//System.out.println(candidates.size());
-		//System.out.println(min_distance);
 		if(candidates.size() == 1) {
 			return candidates.get(0);
 		}
@@ -112,8 +108,6 @@ public class CenterStrategy extends Strategy {
 		Line[] lines = {top_line, left_line, right_line, bottom_line};
 		
 		Line best_line = determineBestCenter(center, lines, model.space_.wind_);
-		System.out.println("sup " + best_line.center_);
-		//System.out.println("center " + center);
 		Line[] line_array = {best_line};
 		
 		return attributeFighters(num_firemen, line_array, model.space_.width_, model.space_.height_, extremes);

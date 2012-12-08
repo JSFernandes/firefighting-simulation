@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import environment.FireFighterModel;
-import environment.Space;
 import environment.WindDirection;
 
 public class FlankingStrategy extends Strategy {

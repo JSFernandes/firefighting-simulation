@@ -1,7 +1,5 @@
 package command;
 
-import java.awt.Point;
-
 import environment.Zone;
 
 public class Command {

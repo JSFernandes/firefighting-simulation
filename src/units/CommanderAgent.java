@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import command.Command;
 
 import environment.FireFighterModel;
-import environment.Space;
 import environment.Zone;
 import strategy.Strategy;
 import uchicago.src.sim.engine.Stepable;
@@ -20,7 +19,7 @@ public class CommanderAgent implements Stepable {
 	
 	ArrayList<Squad> squads_;
 	
-	int time_to_decision_ = 100;
+	int time_to_decision_ = Constants.TICKS_UNTIL_START;
 	
 	public CommanderAgent(FirefighterAgent[] units, FireFighterModel mod, Strategy strat) {
 		units_ = units;
@@ -38,7 +37,6 @@ public class CommanderAgent implements Stepable {
 			sq = new Squad();
 			squads_.add(sq);
 			for(int i = 0; i < pos.get(x).size(); ++i) {
-				//System.out.println(pos.get(i));
 				units_[current_u].orders_.add(new Command(new Zone(pos.get(x).get(i))));
 				units_[current_u].current_order_ = null;
 				units_[current_u].moving_ = false;
