@@ -41,8 +41,12 @@ public class Pathfinding {
 	}
 	
 	public boolean validatePoint(Point point, Space space) {
+		if(point == null)
+			return false;
+		
 		double x = point.x;
 		double y = point.y;
+		
 		return x >= 0 && 
 			x < space.width_
 			&& y >= 0 && y < space.height_

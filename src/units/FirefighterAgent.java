@@ -99,40 +99,39 @@ public class FirefighterAgent implements Drawable {
 		if (fire != null) {
 			int fire_x = fire.getX();
 			int fire_y = fire.getY();
-			
-			int next_x, next_y;
+			int inc_x, inc_y;
 			
 			if(pos_.y < fire_y) {
-				next_y = pos_.y + 1;
+				inc_y = 1;
 			}
 			else if (pos_.y > fire_y){
-				next_y = pos_.y - 1;
+				inc_y = -1;
 			}
 			else {
-				next_y = pos_.y;
+				inc_y = 0;
 			}
 			
 			if(pos_.x < fire_x) {
-				next_x = pos_.x + 1;
+				inc_x = 1;
 			}
 			else if(pos_.x > fire_x){
-				next_x = pos_.x - 1;
+				inc_x = -1;
 			}
 			else {
-				next_x = pos_.x;
+				inc_x = 0;
 			}
 			
-			if(coordsInRange(new Point(next_x, next_y), space_) &&
-					space_.agents_.getObjectAt(next_x, next_y) == null) {
-				//if((squad_ != null && squad_.isInRange(new Point(next_x, next_y))) || squad_ == null) {
-					space_.agents_.putObjectAt(pos_.x, pos_.y, null);
-					pos_.x = next_x;
-					pos_.y = next_y;
-					space_.agents_.putObjectAt(pos_.x, pos_.y, this);
-				//}
-				//else if(squad_ != null) {
-					//squad_.getThingsToDo(this, leader_);
-				//}
+			if(coordsInRange(new Point(pos_.x+inc_x, pos_.y+inc_y), space_) &&
+					space_.agents_.getObjectAt(pos_.x+inc_x, pos_.y+inc_y) == null) {
+				if(squad_ != null && !squad_.isInRange(new Point(pos_.x+inc_x, pos_.y+inc_y))) {
+					inc_x *= -1;
+					inc_y *= -1;
+				}
+					
+				space_.agents_.putObjectAt(pos_.x, pos_.y, null);
+				pos_.x += inc_x;
+				pos_.y += inc_y;
+				space_.agents_.putObjectAt(pos_.x, pos_.y, this);
 			}
 			
 			return true;
