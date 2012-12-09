@@ -38,6 +38,15 @@ public class FireFighterModel extends SimModelImpl {
 	private int strategy = 0;
 	public static int spreadMultiplier = 3;
 	public static int burnMultiplier = 3;
+	private int fireTickRate = 22;
+	private int agentTickRate = 2;
+	private String mapFile = "map1.txt";
+	private int firePosIndex = 3;
+	private int agentPosIndex = 0;
+	private int firePosX=1,firePosY=1;
+	private int agentPosX=1,agentPosY=1;
+
+	private int agentNumber=5;
 	
 	public static void main(String[] args) {
 		SimInit init = new SimInit();
@@ -69,6 +78,7 @@ public class FireFighterModel extends SimModelImpl {
 		configureWind();
 		setExtinguishStrategy(strategy);
 		configureStrategy();
+		setAgentStartPos(agentPosIndex);
 		
 		display_surface_.display();
 	}
@@ -103,19 +113,23 @@ public class FireFighterModel extends SimModelImpl {
 	}
 
 	private void buildModel() {
-		space_ = new Space();
+		
+		space_ = new Space(mapFile,firePosIndex);
 		com_ = new CommanderAgent(null, this, agentStrategy);
-		space_.agents_.putObjectAt(30, 30, new FirefighterAgent(new Point(30, 30), space_, com_));
-		space_.agents_.putObjectAt(30, 31, new FirefighterAgent(new Point(30, 31), space_, com_));
-		space_.agents_.putObjectAt(31, 31, new FirefighterAgent(new Point(31, 31), space_, com_));
-		space_.agents_.putObjectAt(31, 30, new FirefighterAgent(new Point(31, 30), space_, com_));
-		space_.agents_.putObjectAt(30, 29, new FirefighterAgent(new Point(30, 29), space_, com_));
-		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(30, 30));
-		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(30, 31));
-		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(31, 31));
-		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(31, 30));
-		space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(30, 29));
+		calcAgentPos();
+		buildAgents(agentNumber);
 		com_.units_ = space_.firefighters_.toArray(new FirefighterAgent[space_.firefighters_.size()]);
+	}
+	
+	void buildAgents(int n){
+		int x,y;
+		int line=8;
+		for(int i=0; i<n; ++i){
+			x=agentPosX+i%line*2;
+			y=agentPosY+i/line*2;
+			space_.agents_.putObjectAt(x, y, new FirefighterAgent(new Point(x, y), space_, com_));
+			space_.firefighters_.add((FirefighterAgent) space_.agents_.getObjectAt(x, y));
+		}
 	}
 
 	private void initParamDropdowns(){
@@ -141,16 +155,204 @@ public class FireFighterModel extends SimModelImpl {
 		ListPropertyDescriptor pd2 = new ListPropertyDescriptor("ExtinguishStrategy", h2);
 		
 		descriptors.put("ExtinguishStrategy", pd2);
-//		System.out.println(pd.getWidget().getValue());
-//		pd.getWidget().setValue(5);
-//		System.out.println(pd.getWidget().getValue());
+
+
+		Hashtable<String,String> h3 = new Hashtable<String,String>();
+		h3.put("map1.txt", "Map1");
+		h3.put("map2.txt", "Map2");
+		h3.put("map3.txt", "Map3");
+		h3.put("Random", "Random");
+		ListPropertyDescriptor pd3 = new ListPropertyDescriptor("Map", h3);
+		
+		descriptors.put("Map", pd3);
+		
+		
+		Hashtable<Integer,String> h4 = new Hashtable<Integer,String>();
+		h4.put(new Integer(0), "NorthWest");
+		h4.put(new Integer(1), "North");
+		h4.put(new Integer(2), "NorthEast");
+		h4.put(new Integer(3), "East");
+		h4.put(new Integer(4), "SouthEast");
+		h4.put(new Integer(5), "South");
+		h4.put(new Integer(6), "SouthWest");
+		h4.put(new Integer(7), "West");
+		h4.put(new Integer(8), "Center");
+		ListPropertyDescriptor pd4 = new ListPropertyDescriptor("FireStartPos", h4);
+		
+		descriptors.put("FireStartPos", pd4);
+		
+		Hashtable<Integer,String> h5 = new Hashtable<Integer,String>();
+		h5.put(new Integer(0), "NorthWest");
+		h5.put(new Integer(1), "North");
+		h5.put(new Integer(2), "NorthEast");
+		h5.put(new Integer(3), "East");
+		h5.put(new Integer(4), "SouthEast");
+		h5.put(new Integer(5), "South");
+		h5.put(new Integer(6), "SouthWest");
+		h5.put(new Integer(7), "West");
+		h5.put(new Integer(8), "Center");
+		ListPropertyDescriptor pd5 = new ListPropertyDescriptor("AgentStartPos", h5);
+		
+		descriptors.put("AgentStartPos", pd5);
 		
 	}
 	
 	public String[] getInitParam() {
-		String[] params = { "WindDirection", "WindStrength", "SpreadMultiplier", "BurnMultiplier", "ExtinguishStrategy" };	
+		String[] params = { "WindDirection", "WindStrength", "SpreadMultiplier",
+							"BurnMultiplier", "ExtinguishStrategy","ViewRange",
+							"WaterRange","SafetyDistance","SquadMaxSpreadDistance",
+							"CommanderOrderTimeLimit","FireTickRate","AgentTickRate",
+							"Map","FireStartPos", "AgentStartPos", "AgentNumber" };	
 		
 		return params;
+	}
+	
+	public int getAgentNumber(){
+		return agentNumber;
+	}
+	
+	public void setAgentNumber(int a){
+		agentNumber=a;
+	}
+	
+	
+	public int getAgentStartPos(){
+		return agentPosIndex;
+	}
+	
+	public void setAgentStartPos(int a){
+		agentPosIndex=a;
+		
+	}
+	
+	public void calcAgentPos(){
+		double little= 0.15;
+		double middle= 0.5;
+		double big=0.85;
+		
+		int width_ = space_.width_;
+		int height_ = space_.height_;
+		
+		
+		switch (agentPosIndex) {
+		case 0:
+			agentPosX = (int) (width_*little);
+			agentPosY = (int) (height_*little);
+			break;
+		case 1:
+			agentPosX = (int) (width_*middle);
+			agentPosY = (int) (height_*little);
+			break;
+		case 2:
+			agentPosX = (int) (width_*big);
+			agentPosY = (int) (height_*little);
+			break;
+		case 3:
+			agentPosX = (int) (width_*big);
+			agentPosY = (int) (height_*middle);
+			break;
+		case 4:
+			agentPosX = (int) (width_*big);
+			agentPosY = (int) (height_*big);
+			break;
+		case 5:
+			agentPosX = (int) (width_*middle);
+			agentPosY = (int) (height_*big);
+			break;
+		case 6:
+			agentPosX = (int) (width_*little);
+			agentPosY = (int) (height_*big);
+			break;
+		case 7:
+			agentPosX = (int) (width_*little);
+			agentPosY = (int) (height_*middle);
+			break;
+		case 8:
+			agentPosX = (int) (width_*middle);
+			agentPosY = (int) (height_*middle);
+			break;
+		default:
+			break;
+		}
+	}
+	
+	public int getFireStartPos(){
+		return firePosIndex;
+	}
+	
+	public void setFireStartPos(int a){
+		firePosIndex=a;
+	}
+	
+	public String getMap(){
+		return mapFile;
+	}
+	
+	public void setMap(String a){
+		mapFile=a;
+	}
+	
+	public void setAgentTickRate(int a){
+		if(a<=1)a=1;
+		agentTickRate = a;
+	}
+	
+	public int getAgentTickRate(){
+		return agentTickRate;
+	}
+	
+	public void setFireTickRate(int a){
+		if(a<=1)a=1;
+		fireTickRate = a;
+	}
+	
+	public int getFireTickRate(){
+		return fireTickRate;
+	}
+	
+	public void setCommanderOrderTimeLimit(int a){
+		if(a<0)a=0;
+		units.Constants.TICKS_UNTIL_START = a;
+	}
+	
+	public int getCommanderOrderTimeLimit(){
+		return units.Constants.TICKS_UNTIL_START;
+	}
+	
+	public void setSquadMaxSpreadDistance(int a){
+		if(a<0)a=0;
+		units.Constants.MAX_SPREAD_RADIUS_PER_MEN = a;
+	}
+	
+	public int getSquadMaxSpreadDistance(){
+		return units.Constants.MAX_SPREAD_RADIUS_PER_MEN;
+	}
+	
+	public void setSafetyDistance(int a){
+		if(a<0)a=0;
+		units.Constants.SAFE_DISTANCE = a;
+	}
+	
+	public int getSafetyDistance(){
+		return units.Constants.SAFE_DISTANCE;
+	}
+	
+	public void setWaterRange(int a){
+		if(a<0)a=0;
+		units.Constants.DEFAULT_WATER_RANGE = a;
+	}
+	
+	public int getWaterRange(){
+		return units.Constants.DEFAULT_WATER_RANGE;
+	}
+	
+	public void setViewRange(int a){
+		if(a<0)a=0;
+		units.Constants.DEFAULT_VISION_RADIUS = a;
+	}
+	
+	public int getViewRange(){
+		return units.Constants.DEFAULT_VISION_RADIUS;
 	}
 	
 	public void setBurnMultiplier(int a){
@@ -204,6 +406,7 @@ public class FireFighterModel extends SimModelImpl {
 	}
 
 	public void setWindStrength(int a){
+		if(a<0)a=0;
 		windStrength =  a;
 		configureWind();
 		

@@ -10,11 +10,11 @@ public class FieldMap {
 	public static int width_;
 	public static int height_;
 	
-	public static Object2DTorus getMap() throws Exception {
+	public static Object2DTorus getMap(String file) throws Exception {
 		Object2DTorus map;
 		String currentDir = new File(".").getAbsolutePath();
 		 System.out.println(currentDir);
-		 BufferedReader reader = new BufferedReader(new FileReader("map.txt"));
+		 BufferedReader reader = new BufferedReader(new FileReader(file));
 		 
 		    try {
 		        String[] dimensions = reader.readLine().split(" ");

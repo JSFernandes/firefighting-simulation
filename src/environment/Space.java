@@ -23,9 +23,11 @@ public class Space {
 	ArrayList<FirefighterAgent> firefighters_;
 	
 	
-	public Space() {
+	public Space(String file, int firePos) {
 		try {
-			trees_ = FieldMap.getMap();
+			if(file=="Random") throw new Exception();
+			
+			trees_ = FieldMap.getMap(file);
 			width_ = FieldMap.width_;
 			height_ = FieldMap.height_;
 			
@@ -40,11 +42,55 @@ public class Space {
 		
 		toFieldMap();
 		
-		//wind_=WindDirection.N;
-		//wind_.setStrength(3);
+		double little= 0.2;
+		double middle= 0.5;
+		double big=0.8;
 		
+		int firePosX=1,firePosY=1;
+		switch (firePos) {
+		case 0:
+			firePosX = (int) (width_*little);
+			firePosY = (int) (height_*little);
+			break;
+		case 1:
+			firePosX = (int) (width_*middle);
+			firePosY = (int) (height_*little);
+			break;
+		case 2:
+			firePosX = (int) (width_*big);
+			firePosY = (int) (height_*little);
+			break;
+		case 3:
+			firePosX = (int) (width_*big);
+			firePosY = (int) (height_*middle);
+			break;
+		case 4:
+			firePosX = (int) (width_*big);
+			firePosY = (int) (height_*big);
+			break;
+		case 5:
+			firePosX = (int) (width_*middle);
+			firePosY = (int) (height_*big);
+			break;
+		case 6:
+			firePosX = (int) (width_*little);
+			firePosY = (int) (height_*big);
+			break;
+		case 7:
+			firePosX = (int) (width_*little);
+			firePosY = (int) (height_*middle);
+			break;
+		case 8:
+			firePosX = (int) (width_*middle);
+			firePosY = (int) (height_*middle);
+			break;
+		default:
+			break;
+		}
 		
-		startFire();
+		System.out.println(firePos+" "+firePosX+" "+firePosY);
+		
+		startFire(firePosX,firePosY);
 		firefighters_ = new ArrayList<FirefighterAgent>();
 	}
 
@@ -52,23 +98,10 @@ public class Space {
 		wind_ = new WindDirection(windDirection, windStrength);
 	}
 	
-	void startFire() {
-		for (int i = 0; i < 1; ++i) {
-			addAgent();
-		}
-	}
-
-	public void addAgent() {
-		int x, y;
-		x = Random.uniform.nextIntFromTo(0, width_ - 1);
-		y = Random.uniform.nextIntFromTo(0, height_ - 1);
+	void startFire(int x,int y) {
 		FireManipulator fire_agent = new FireManipulator(x, y, this);
 		//fire_agent.fire_intensity_ = 1;
 		agents_.putObjectAt(x, y, fire_agent);
-	}
-
-	public void addAgent(int x, int y) {
-		agents_.putObjectAt(x, y, new FireManipulator(x, y, this));
 	}
 
 	void toFieldMap(){
